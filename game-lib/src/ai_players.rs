@@ -34,7 +34,7 @@ fn will_cause_win(game_board: &GameBoard, player: &Players, game_move: GameMove)
         .count();
 
     //if top is greater then six, the move is invalid, and the can not cause a win. 
-    if top < 6 {
+    if top > 5 {
         return false;
     }
 
