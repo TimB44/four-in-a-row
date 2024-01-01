@@ -58,6 +58,9 @@ impl GameBoard {
                 return Err("Board can not contain floating pieces");
             }
         }
+
+        //todo check for wins maybe?
+
         Ok(GameBoard {
             board,
             _private: (),

@@ -1,3 +1,5 @@
+use rand::Rng;
+
 use crate::board::{GameBoard, GameMove, Players};
 
 /// Simple algorithm which Searches for possible wins, or blocks possible losses.
@@ -19,11 +21,15 @@ pub fn play_easy(board: GameBoard) -> GameMove {
         }
     }
 
-    GameMove::build(
-        board.get_board()[5]
-            .iter()
-            .take_while(|p| p.is_some())
-            .count() as u8,
-    )
-    .unwrap()
+    let valid_moves: Vec<usize> = board.get_board()[5]
+        .iter()
+        .enumerate()
+        .filter(|(_, p)| p.is_none())
+        .map(|(i, _)| i)
+        .collect();
+
+    let i = rand::thread_rng().gen_range(0..valid_moves.len());
+
+    GameMove::build(i as u8).unwrap()
+
 }
