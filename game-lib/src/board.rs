@@ -212,7 +212,7 @@ impl GameMove {
 
 impl GameMove {
     pub fn build(col: u8) -> Result<GameMove, &'static str> {
-        if col < 8 {
+        if col < 7 {
             Ok(GameMove(col))
         } else {
             Err("Columns must be between 0 and 7")
