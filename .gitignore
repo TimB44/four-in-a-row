@@ -1,2 +1,33 @@
 /game-lib/target/
 /game-server/target/
+
+.vscode/
+*.vscode/
+/game-frontend/dist
+
+
+
+# Logs
+game-frontend/logs
+game-frontend/*.log
+game-frontend/npm-debug.log*
+game-frontend/yarn-debug.log*
+game-frontend/yarn-error.log*
+game-frontend/pnpm-debug.log*
+game-frontend/lerna-debug.log*
+
+game-frontend/node_modules
+game-frontend/dist
+game-frontend/dist-ssr
+*.local
+
+# Editor directories and files
+.vscode/*
+!game-frontend/.vscode/extensions.json
+game-frontend/.idea
+game-frontend/.DS_Store
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.sw?
