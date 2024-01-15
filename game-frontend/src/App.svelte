@@ -1,41 +1,34 @@
 <script>
   import Game from './lib/Game.svelte'
+  import GameSelector from './lib/GameSelector.svelte'
 
+  let gameInProg = false;
+  let game;
 
 </script>
 
 <main>
-  
+
   <h1>Four In a Row</h1>
+  
+  {#if !gameInProg}
+    <GameSelector on:gameStart = {(e) => {
+      gameInProg = true;
+      game.startGame()}}/>
+  {/if}  
 
-  <div class="card">
-    <Game on:gameover= {(e) => alert(e.detail.winner)}
-    playerOneIsRed = {true} isAi = {false} difficulty = "n/a"/>
-  </div>
+  <Game bind:this = {game} on:gameover= {(e) => {
+    game.endGame();
+    gameInProg = false;
+    }}/>
 
-  <p>
-    Check out <a href="https://github.com/sveltejs/kit#readme" target="_blank" rel="noreferrer">SvelteKit</a>, the official Svelte app framework powered by Vite!
-  </p>
-
-  <p class="read-the-docs">
-    Click on the Vite and Svelte logos to learn more
-  </p>
 </main>
 
 <style>
-  .logo {
-    height: 6em;
-    padding: 1.5em;
-    will-change: filter;
-    transition: filter 300ms;
-  }
-  .logo:hover {
-    filter: drop-shadow(0 0 2em #646cffaa);
-  }
-  .logo.svelte:hover {
-    filter: drop-shadow(0 0 2em #ff3e00aa);
-  }
-  .read-the-docs {
-    color: #888;
+ main {
+    height: 100vh;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
   }
 </style>

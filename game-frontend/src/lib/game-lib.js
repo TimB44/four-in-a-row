@@ -1,5 +1,3 @@
-import { randomBytes } from "crypto";
-
 /**
  * 
  * @param {number[][]} board 
@@ -50,7 +48,21 @@ function verticalWin(board) {
  * @returns {number}
  */
 function horizontalWin(board) {
-    throw new Error("Function not implemented.");
+    for(let row = 0; row < 6; row++) {
+        colLoop: for(let col = 0; col < 4; col++) {
+            let player = board[row][col];
+
+            if(player === 0) continue;
+
+            for(let i = 1; i < 4; i++) {
+                if(board[row][col + i] !== player)
+                    continue colLoop;
+            }
+            return player;
+        }
+    }
+
+    return 0;
 }
 
 /**
@@ -59,7 +71,21 @@ function horizontalWin(board) {
  * @returns {number}
  */
 function upDiagonalWin(board) {
-    throw new Error("Function not implemented.");
+    for(let row = 0; row < 3; row++) {
+        colLoop: for(let col = 0; col < 4; col++) {
+            let player = board[row][col];
+
+            if(player === 0) continue;
+
+            for(let i = 1; i < 4; i++) {
+                if(board[row + i][col + i] !== player)
+                    continue colLoop;
+            }
+            return player;
+        }
+    }
+
+    return 0;
 }
 
 /**
@@ -68,6 +94,20 @@ function upDiagonalWin(board) {
  * @returns {number}
  */
 function downDiagonalWin(board) {
-    throw new Error("Function not implemented.");
+    for(let row = 3; row < 6; row++) {
+        colLoop: for(let col = 0; col < 4; col++) {
+            let player = board[row][col];
+
+            if(player === 0) continue;
+
+            for(let i = 1; i < 4; i++) {
+                if(board[row - i][col + i] !== player)
+                    continue colLoop;
+            }
+            return player;
+        }
+    }
+
+    return 0;
 }
 
