@@ -4,6 +4,7 @@
 
   let gameInProg = false;
   let game;
+  let winnerText = "";
 
 </script>
 
@@ -15,11 +16,18 @@
     <GameSelector on:gameStart = {(e) => {
       gameInProg = true;
       game.startGame()}}/>
-  {/if}  
+
+  {/if}
+  
+  {#if winnerText !== ""}
+      <h3>{winnerText === "Draw" ? "Draw" : winnerText + " Wins"}</h3>
+
+  {/if}
 
   <Game bind:this = {game} on:gameover= {(e) => {
     game.endGame();
     gameInProg = false;
+    winnerText = e.detail.winner;
     }}/>
 
 </main>
