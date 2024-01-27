@@ -24,7 +24,7 @@
 
   onMount(() => {
     endGame();
-  })
+  });
 
   let turns = 0;
   let buttons = [];
@@ -32,22 +32,18 @@
   let board = Array.from({ length: 6 }, () => Array(7).fill(0));
   let visualBoard;
 
-
-
   export function startGame() {
     disabled = Array(7).fill(false);
     board = Array.from({ length: 6 }, () => Array(7).fill(0));
     turns = 0;
     inGame = true;
-    buttons.forEach((e) => e.disabled = false);
+    buttons.forEach((e) => (e.disabled = false));
     visualBoard.clear();
-
-    
   }
 
   export function endGame() {
     inGame = false;
-    buttons.forEach((e) => e.disabled = true);
+    buttons.forEach((e) => (e.disabled = true));
   }
 
   /**
@@ -77,12 +73,11 @@
 
     if (row === 5) disabled[col] = true;
 
-    let player = turns % 2 === 0 ? "red" : "blue";
+    let player = turns % 2 === 0 ? 1 : -1;
 
-    board[row][col] = !isOnePlayer && player === "blue" ? -1 : 1;
+    board[row][col] = player;
+    visualBoard.placePiece(row, col, player === 1 ? "red" : "blue");
     turns++;
-
-    visualBoard.placePiece(row, col, player);
 
     let winner = gameIsOver(board);
 
@@ -95,15 +90,45 @@
       gameOver("Draw");
     }
 
-    if (!isOnePlayer) {
+    let isAiMove =
+      !isOnePlayer &&
+      ((firstPlayerIsRed && player === 1) ||
+        (!firstPlayerIsRed && player === -1));
+
+    if (!isOnePlayer || isAiMove) {
       for (let i = 0; i < disabled.length; i++) {
         buttons[i].disabled = disabled[i];
       }
     } else {
-      //todo
+      playAIMove();
     }
+  }
 
-    board = board;
+  async function playAIMove() {
+    let start = Date.now();
+    let promise = fetch("/ai", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ board: board, difficulty: aiDifficulty }),
+    });
+
+    let resp = await promise;
+
+    let json = await resp.json();
+
+    let move = json["move"];
+    let dur = Date.now() - start;
+    if (dur < 2000) {
+      setTimeout(() => {
+        console.log("here");
+        playMove(move);
+      }, dur);
+    } else {
+      console.log("here");
+      playMove(move);
+    }
   }
 </script>
 

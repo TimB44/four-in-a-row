@@ -7,8 +7,11 @@
   let winnerText = "";
 
 </script>
-
+<head>
+  <title>Four In a Row</title>
+</head>
 <main>
+  
 
   <h1>Four In a Row</h1>
   

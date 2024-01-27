@@ -78,8 +78,8 @@ impl GameBoard {
             .take_while(|p| p.is_some())
             .count();
 
-        //if top is greater then six, the move is invalid, and the can not cause a win.
-        if top > 6 {
+        //if top is greater then five, the move is invalid, and the can not cause a win.
+        if top > 5 {
             return false;
         }
 
