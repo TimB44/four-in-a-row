@@ -1,5 +1,5 @@
 <script>
-  import Game from './lib/Game.svelte'
+  import LocalGameControl from './lib/LocalGameControl.svelte';
   import GameSelector from './lib/GameSelector.svelte'
 
   let gameInProg = false;
@@ -18,19 +18,18 @@
   {#if !gameInProg}
     <GameSelector on:gameStart = {(e) => {
       gameInProg = true;
-      game.startGame()}}/>
+      game.start()}}/>
 
   {/if}
   
   {#if winnerText !== ""}
-      <h3>{winnerText === "Draw" ? "Draw" : winnerText + " Wins"}</h3>
+      <dialog>{winnerText}</dialog>
 
   {/if}
 
-  <Game bind:this = {game} on:gameover= {(e) => {
-    game.endGame();
+  <LocalGameControl bind:this = {game} on:gameEnd= {(e) => {
     gameInProg = false;
-    winnerText = e.detail.winner;
+    winnerText = e.detail.message;
     }}/>
 
 </main>
