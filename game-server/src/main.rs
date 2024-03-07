@@ -1,7 +1,7 @@
-use axum::{http::StatusCode, response::{ Html, IntoResponse}, routing::{post, get}, Json, Router};
+use axum::{response::IntoResponse, routing::post, Json, Router};
 use serde::Deserialize;
 use serde_json::json;
-use tokio::{fs, net::TcpListener};
+use tokio::net::TcpListener;
 use tower_http::services::{ServeDir, ServeFile};
 
 
@@ -14,8 +14,8 @@ async fn main() {
         .nest_service("/", ServeFile::new("static/index.html"))
         .nest_service("/static",ServeDir::new("static"));
         
-
-    let listener = TcpListener::bind("127.0.0.1:8080").await.expect("Could not create the tcp listener");
+        //"127.0.0.1:8080"
+    let listener = TcpListener::bind("192.168.0.115:8080").await.expect("Could not create the tcp listener");
     println!("->> LISTENING on {:?} \n", listener.local_addr());
 
     axum::serve(listener, routes_hello.into_make_service() ).await.unwrap();
