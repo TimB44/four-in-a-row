@@ -7,7 +7,7 @@
   let mode = $gameSettings.mode;
   let botDiff = $gameSettings.botSettings.botDiff;
   let playerIsFirst = $gameSettings.botSettings.playerIsFirst;
-  $: gameSettings.set({ mode: mode, botSettings: {botDiff, playerIsFirst} });
+  $: gameSettings.set({ mode: mode, botSettings: { botDiff, playerIsFirst } });
 </script>
 
 <h2>Game Options</h2>
@@ -27,7 +27,7 @@
 
     <label>
       <input
-      checked={!playerIsFirst}
+        checked={!playerIsFirst}
         name="color"
         type="radio"
         bind:group={playerIsFirst}
@@ -52,7 +52,7 @@
 
     <label>
       <input
-      checked ={mode== 1}
+        checked={mode == 1}
         name="playerNum"
         type="radio"
         bind:group={mode}
@@ -75,6 +75,28 @@
         disabled={mode !== 2}
       />
       Easy
+    </label>
+    <label>
+      <input
+        checked={botDiff === "medium"}
+        name="AiDifficulty"
+        type="radio"
+        bind:group={botDiff}
+        value={"medium"}
+        disabled={mode !== 2}
+      />
+      Medium
+    </label>
+    <label>
+      <input
+        checked={botDiff === "hard"}
+        name="AiDifficulty"
+        type="radio"
+        bind:group={botDiff}
+        value={"hard"}
+        disabled={mode !== 2}
+      />
+      Hard
     </label>
     <!-- todo add more ai -->
   </div>

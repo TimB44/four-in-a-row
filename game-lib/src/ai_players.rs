@@ -130,4 +130,18 @@ mod tests {
         let gb = GameBoard::build(board, GamePlayer::Computer).unwrap();
         println!("{:?}", play_hard(gb).unwrap());
     }
+
+
+    #[test]
+    fn play_hard_mid_game() {
+        let mut board = [[None; 7]; 6];
+
+        board[0][2] = Some(GamePlayer::Opponent);
+        board[0][3] = Some(GamePlayer::Opponent);
+
+        board[1][3] = Some(GamePlayer::Computer);
+
+        let gb = GameBoard::build(board, GamePlayer::Opponent).unwrap();
+        print!("{:?}", play_hard(gb));
+    }
 }

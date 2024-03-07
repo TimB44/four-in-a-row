@@ -15,8 +15,8 @@
   let turns = 0;
   let buttons;
   let visualBoard;
-  console.log("in bot game control.")
-  console.log(`player is first: ${playerIsFirst}`)
+  console.log("in bot game control.");
+  console.log(`player is first: ${playerIsFirst}`);
 
   onMount(() => {
     buttons.disable();
@@ -83,7 +83,11 @@
       headers: {
         "Content-Type": "application/json",
       },
-      body: JSON.stringify({ board: board, difficulty: botDiff }),
+      body: JSON.stringify({
+        board: board,
+        difficulty: botDiff,
+        first_player: playerIsFirst ? 1 : -1,
+      }),
     });
 
     let resp = await promise;
@@ -106,8 +110,7 @@
     if (!playerIsFirst) {
       buttons.disable();
       playAIMove();
-    }
-    else {
+    } else {
       buttons.enable();
     }
   }
@@ -134,7 +137,6 @@
   <GameButtons
     bind:this={buttons}
     on:buttonClick={(e) => {
-
       playMove(e.detail.col);
     }}
   ></GameButtons>

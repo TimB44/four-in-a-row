@@ -6,19 +6,19 @@ mod minimax;
 
 type GameError = &'static str;
 
-pub fn next_easy_move_json(board: [[i32; 7]; 6], first_player: i32) -> Result<u8, &'static str> {
+pub fn next_easy_move(board: [[i32; 7]; 6], first_player: i32) -> Result<u8, &'static str> {
     let board = parse_board(board, first_player)?;
 
     Ok(ai_players::play_easy(board)?.get_col())
 }
 
-pub fn next_medium_move_json(board: [[i32; 7]; 6], first_player: i32) -> Result<u8, &'static str> {
+pub fn next_medium_move(board: [[i32; 7]; 6], first_player: i32) -> Result<u8, &'static str> {
     let board = parse_board(board, first_player)?;
 
     Ok(ai_players::play_med(board)?.get_col())
 }
 
-pub fn next_hard_move_json(board: [[i32; 7]; 6], first_player: i32) -> Result<u8, &'static str> {
+pub fn next_hard_move(board: [[i32; 7]; 6], first_player: i32) -> Result<u8, &'static str> {
     let board = parse_board(board, first_player)?;
 
     Ok(ai_players::play_hard(board)?.get_col())

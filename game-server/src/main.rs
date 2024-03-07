@@ -15,7 +15,7 @@ async fn main() {
         .nest_service("/static",ServeDir::new("static"));
         
         //"127.0.0.1:8080"
-    let listener = TcpListener::bind("192.168.0.115:8080").await.expect("Could not create the tcp listener");
+    let listener = TcpListener::bind("127.0.0.1:8080").await.expect("Could not create the tcp listener");
     println!("->> LISTENING on {:?} \n", listener.local_addr());
 
     axum::serve(listener, routes_hello.into_make_service() ).await.unwrap();
@@ -27,10 +27,13 @@ async fn handler_hello(Json(params): Json<GameParams>) -> impl IntoResponse {
 
     let dif = params.difficulty.as_deref().unwrap_or("BAD"); 
     let board = params.board.unwrap();
+    let first = params.first_player.unwrap();
 
     let game_move = match dif {
-        "easy" => {game_lib::next_easy_move(board).unwrap()}
-        _ => todo!()
+        "easy" => {game_lib::next_easy_move(board, first).unwrap()},
+        "medium" => {game_lib::next_medium_move(board, first).unwrap()},
+        "hard" => {game_lib::next_hard_move(board, first).unwrap()},
+        _ => panic!("invalid difficulty")
     };
 
 
@@ -41,4 +44,5 @@ async fn handler_hello(Json(params): Json<GameParams>) -> impl IntoResponse {
 struct GameParams {
     board: Option<[[i32; 7]; 6]>,
     difficulty: Option<String>, 
+    first_player: Option<i32>,
 }
