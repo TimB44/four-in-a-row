@@ -3,16 +3,24 @@
   import { gameIsOver } from "./game-lib";
   import Board from "./Board.svelte";
   import GameButtons from "./GameButtons.svelte";
+  import { onMount } from "svelte";
+
+  export let botDiff = "easy";
+  export let playerIsFirst = true;
 
   const dispatch = createEventDispatcher();
-
-
 
   let disabled = Array(7).fill(false);
   let board = Array.from({ length: 6 }, () => Array(7).fill(0));
   let turns = 0;
   let buttons;
   let visualBoard;
+  console.log("in bot game control.")
+  console.log(`player is first: ${playerIsFirst}`)
+
+  onMount(() => {
+    buttons.disable();
+  });
 
   /**
    * Ends the game and triggers and event to notify its parent
@@ -35,15 +43,17 @@
   }
 
   function playMove(col) {
-    for (let i = 0; i < 7; i++) {
-      buttons.setCol(i, true);
-    }
+    buttons.disable();
 
     let row = top(col);
 
     if (row === 5) disabled[col] = true;
 
-    let player = turns % 2 === 0 ? 1 : -1;
+    //player is 1, ai is -1
+    let player =
+      (turns % 2 === 0 && playerIsFirst) || (turns % 2 === 1 && !playerIsFirst)
+        ? 1
+        : -1;
 
     board[row][col] = player;
     visualBoard.placePiece(row, col, player === 1 ? "red" : "blue");
@@ -58,43 +68,48 @@
 
     if (turns == 42) {
       endGame("Draw");
+      return;
     }
+    if (player == 1) {
+      playAIMove();
+    } else {
+      disabled.forEach((val, i) => buttons.setCol(i, val));
+    }
+  }
+  async function playAIMove() {
+    let start = Date.now();
+    let promise = fetch("/ai", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ board: board, difficulty: botDiff }),
+    });
 
-    for (let i = 0; i < 7; i++) {
-      buttons.setCol(i, disabled[i]);
+    let resp = await promise;
+
+    let json = await resp.json();
+
+    let move = json["move"];
+    let dur = Date.now() - start;
+    if (dur < 250) {
+      setTimeout(() => {
+        playMove(move);
+      }, 250 - dur);
+    } else {
+      playMove(move);
     }
   }
 
-  //   async function playAIMove() {
-  //     let start = Date.now();
-  //     let promise = fetch("/ai", {
-  //       method: "POST",
-  //       headers: {
-  //         "Content-Type": "application/json",
-  //       },
-  //       body: JSON.stringify({ board: board, difficulty: aiDifficulty }),
-  //     });
-
-  //     let resp = await promise;
-
-  //     let json = await resp.json();
-
-  //     let move = json["move"];
-  //     let dur = Date.now() - start;
-  //     if (dur < 2000) {
-  //       setTimeout(() => {
-  //         console.log("here");
-  //         playMove(move);
-  //       }, dur);
-  //     } else {
-  //       console.log("here");
-  //       playMove(move);
-  //     }
-  //   }
-
   //Starts a new game session
   export function start() {
-    clear();
+    if (!playerIsFirst) {
+      buttons.disable();
+      playAIMove();
+    }
+    else {
+      buttons.enable();
+    }
   }
 
   // Clears the board to the state it is when first created
@@ -103,12 +118,13 @@
     board.forEach((row) => row.fill(0));
     turns = 0;
     visualBoard.clear();
-    buttons.enable();
+    buttons.disable();
   }
 
   // Starts a new game with some state shared between sessions
   // In this game setting it is the same as start
   export function restart() {
+    clear();
     start();
   }
 </script>
@@ -117,7 +133,10 @@
   <Board bind:this={visualBoard} />
   <GameButtons
     bind:this={buttons}
-    on:buttonClick={(e) => {playMove(e.detail.col);}}
+    on:buttonClick={(e) => {
+
+      playMove(e.detail.col);
+    }}
   ></GameButtons>
 </div>
 

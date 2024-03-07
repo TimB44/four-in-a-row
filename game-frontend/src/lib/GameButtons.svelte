@@ -3,7 +3,11 @@
   const dispatch = createEventDispatcher();
   let buttons = [];
 
-  export function clear() {
+  export function disable() {
+    buttons.forEach((b) => b.disabled = true);
+  }
+
+  export function enable() {
     buttons.forEach((b) => b.disabled = false);
   }
   /**
