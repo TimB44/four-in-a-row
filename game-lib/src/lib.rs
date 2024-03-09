@@ -1,7 +1,7 @@
 use board::{GameBoard, GamePlayer};
 
 mod ai_players;
-mod board;
+pub mod board;
 mod minimax;
 
 type GameError = &'static str;

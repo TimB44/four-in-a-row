@@ -265,6 +265,13 @@ impl GameBoard {
 
         Ok(board)
     }
+    
+    pub fn equals_arr(&self, prev_board: &[[i8; 7]; 6]) -> bool {
+        todo!()
+    }
+    pub fn to_arr(&self) -> [[i8;7];6] {
+        todo!();
+    }
 }
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
