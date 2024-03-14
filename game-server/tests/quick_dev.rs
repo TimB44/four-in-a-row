@@ -7,5 +7,5 @@ async fn quick_dev() -> Result<()> {
     hc.do_get("/").await?.print().await?;
 
     hc.do_post("/ai", json!({"difficulty": "easy", "board": [[0, 0, 0, 0, 0, 0, 0],[0, 0, 0, 0, 0, 0, 0],[0, 0, 0, 0, 0, 0, 0],[0, 0, 0, 0, 0, 0, 0],[0, 0, 0, 0, 0, 0, 0],[0, 0, 0, 0, 0, 0, 0]]})).await?.print().await?;
-    Ok(()) 
+    Ok(())
 }

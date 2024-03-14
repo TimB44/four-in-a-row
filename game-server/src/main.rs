@@ -2,10 +2,11 @@ use axum::{response::IntoResponse, routing::post, Json, Router};
 use serde::Deserialize;
 use serde_json::json;
 use std::collections::HashMap;
-use std::sync::{Arc, Mutex};
-use tokio::net::TcpListener;
+use std::sync::Arc;
+use tokio::{net::TcpListener, sync::Mutex};
 use tower_http::services::{ServeDir, ServeFile};
 
+mod ai;
 mod multiplayer;
 use multiplayer::GameState;
 
@@ -15,9 +16,9 @@ type GameMap = Arc<Mutex<HashMap<u32, GameState>>>;
 async fn main() {
     let state: Arc<Mutex<HashMap<u32, GameState>>> = Arc::new(Mutex::new(HashMap::new()));
     let routes_hello = Router::new()
-        .route("/ai", post(handler_hello))
-        .route("/multiplayer/create_game", post(multiplayer::create_game))
+        .nest("/multiplayer", multiplayer::routes())
         .with_state(state)
+        .route("/ai", post(handler_hello))
         .nest_service("/", ServeFile::new("static/index.html"))
         .nest_service("/static", ServeDir::new("static"));
 
@@ -27,9 +28,7 @@ async fn main() {
         .expect("Could not create the tcp listener");
     println!("->> LISTENING on {:?} \n", listener.local_addr());
 
-    axum::serve(listener, routes_hello)
-        .await
-        .unwrap();
+    axum::serve(listener, routes_hello).await.unwrap();
 }
 
 async fn handler_hello(Json(params): Json<GameParams>) -> impl IntoResponse {
