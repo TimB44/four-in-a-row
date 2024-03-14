@@ -12,6 +12,14 @@ pub struct GameBoard {
 }
 
 impl GameBoard {
+    pub fn new() -> GameBoard{
+        GameBoard {
+            board: [[None; 7]; 6],
+            first_player: GamePlayer::Computer,
+            total_moves: 0,
+            winning_move: None,
+        }
+    }
     pub fn make_move(&mut self, game_move: &GameMove) -> Result<(), GameError> {
         let col = game_move.0 as usize;
         if self.is_over() {
@@ -30,7 +38,7 @@ impl GameBoard {
             }
         }
 
-        Err("Can not make move as column is full")
+        Err("Can not make move because given column is full")
     }
 
     pub fn undo_move(&mut self, game_move: &GameMove) -> Result<(), GameError> {
@@ -300,7 +308,7 @@ impl GameMove {
         GameMove(col as u8)
     }
 
-    #[cfg(test)]
+
     pub fn build(col: u8) -> Result<GameMove, &'static str> {
         if col < 7 {
             Ok(GameMove(col))
