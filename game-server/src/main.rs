@@ -1,9 +1,9 @@
-use axum::{response::IntoResponse, routing::post, Json, Router};
+use axum::{http::StatusCode, response::IntoResponse, routing::post, Json, Router};
 use serde::Deserialize;
 use serde_json::json;
 use std::collections::HashMap;
 use std::sync::Arc;
-use tokio::{net::TcpListener, sync::Mutex};
+use tokio::{task, net::TcpListener, sync::Mutex};
 use tower_http::services::{ServeDir, ServeFile};
 
 mod ai;
@@ -37,13 +37,18 @@ async fn handler_hello(Json(params): Json<GameParams>) -> impl IntoResponse {
     let dif = params.difficulty.as_deref().unwrap_or("BAD");
     let board = params.board.unwrap();
     let game_move = match dif {
-        "easy" => game_lib::next_easy_move(board).unwrap(),
-        "medium" => game_lib::next_medium_move(board).unwrap(),
-        "hard" => game_lib::next_hard_move(board).unwrap(),
-        _ => panic!("invalid difficulty"),
+        "easy" => task::spawn_blocking(move || {game_lib::next_easy_move(board)}).await,
+        "medium" => task::spawn_blocking(move || {game_lib::next_medium_move(board)}).await,
+        "hard" => task::spawn_blocking(move || {game_lib::next_hard_move(board)}).await,
+        _ => return (StatusCode::BAD_REQUEST, "Invalid difficulty, must be easy, medium or hard").into_response(),
+    };
+    let game_move = match game_move{
+        Ok(Ok(game_move)) => game_move,
+        Ok(Err(msg)) => return (StatusCode::BAD_REQUEST, msg).into_response(),
+        Err(_) => return StatusCode::INTERNAL_SERVER_ERROR.into_response(),
     };
 
-    Json(json!({"move" : game_move,}))
+    Json(json!({"move" : game_move,})).into_response()
 }
 
 #[derive(Debug, Deserialize)]
