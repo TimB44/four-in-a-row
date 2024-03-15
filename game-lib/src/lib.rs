@@ -6,42 +6,37 @@ mod minimax;
 
 type GameError = &'static str;
 
-pub fn next_easy_move(board: [[i32; 7]; 6], first_player: i32) -> Result<u8, &'static str> {
-    let board = parse_board(board, first_player)?;
+pub fn next_easy_move(board: [[i8; 7]; 6]) -> Result<u8, GameError> {
+    let board = parse_board(board)?;
 
     Ok(ai_players::play_easy(board)?.get_col())
 }
 
-pub fn next_medium_move(board: [[i32; 7]; 6], first_player: i32) -> Result<u8, &'static str> {
-    let board = parse_board(board, first_player)?;
+pub fn next_medium_move(board: [[i8; 7]; 6]) -> Result<u8, GameError> {
+    let board = parse_board(board)?;
 
     Ok(ai_players::play_med(board)?.get_col())
 }
 
-pub fn next_hard_move(board: [[i32; 7]; 6], first_player: i32) -> Result<u8, &'static str> {
-    let board = parse_board(board, first_player)?;
+pub fn next_hard_move(board: [[i8; 7]; 6]) -> Result<u8, GameError> {
+    let board = parse_board(board)?;
 
     Ok(ai_players::play_hard(board)?.get_col())
 }
 
-fn parse_board(num_board: [[i32; 7]; 6], first_player: i32) -> Result<GameBoard, &'static str> {
+fn parse_board(num_board: [[i8; 7]; 6]) -> Result<GameBoard, GameError> {
     let mut board = [[None; 7]; 6];
 
-    for (row_index, row) in num_board.iter().enumerate() {
-        for (col_index, piece) in row.iter().enumerate() {
-            board[row_index][col_index] = match piece {
-                1 => Some(GamePlayer::Opponent),
+    for row in 0..6 {
+        for col in 0..7 {
+            board[row][col] = match num_board[row][col] {
+                1 => Some(GamePlayer::FirstPlayer),
                 0 => None,
-                -1 => Some(GamePlayer::Computer),
-                _ => return Err("Board can only contain 1, 0 and -1"),
-            };
+                -1 => Some(GamePlayer::SecondPlayer),
+                _ => return Err("Board can only contain 1, 0, and -1"),
+            }
         }
     }
-    let player = match first_player {
-        1 => GamePlayer::Opponent,
-        -1 => GamePlayer::Computer,
-        _ => return Err("Player must be 1 or -1"),
-    };
 
-    GameBoard::build(board, player)
+    GameBoard::build(board)
 }

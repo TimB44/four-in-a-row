@@ -8,7 +8,7 @@ use crate::{
 pub fn minimax(mut board: GameBoard, depth: u8) -> Result<GameMove, GameError> {
     if board.is_over() {
         return Err("Game is already over");
-    }      
+    }
 
     if depth < 1 {
         return Err("Depth must be at least 1");
@@ -17,7 +17,7 @@ pub fn minimax(mut board: GameBoard, depth: u8) -> Result<GameMove, GameError> {
     let player = board.current_player();
 
     match player {
-        GamePlayer::Opponent => {
+        GamePlayer::FirstPlayer => {
             let mut min = i32::MAX;
             let mut min_move = None;
             for possible_move in board.moves() {
@@ -33,7 +33,7 @@ pub fn minimax(mut board: GameBoard, depth: u8) -> Result<GameMove, GameError> {
 
             min_move
         }
-        GamePlayer::Computer => {
+        GamePlayer::SecondPlayer => {
             let mut max = i32::MIN;
             let mut max_move = None;
             for possible_move in board.moves() {
