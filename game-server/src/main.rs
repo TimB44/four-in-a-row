@@ -36,12 +36,10 @@ async fn handler_hello(Json(params): Json<GameParams>) -> impl IntoResponse {
 
     let dif = params.difficulty.as_deref().unwrap_or("BAD");
     let board = params.board.unwrap();
-    let first = params.first_player.unwrap();
-
     let game_move = match dif {
-        "easy" => game_lib::next_easy_move(board, first).unwrap(),
-        "medium" => game_lib::next_medium_move(board, first).unwrap(),
-        "hard" => game_lib::next_hard_move(board, first).unwrap(),
+        "easy" => game_lib::next_easy_move(board).unwrap(),
+        "medium" => game_lib::next_medium_move(board).unwrap(),
+        "hard" => game_lib::next_hard_move(board).unwrap(),
         _ => panic!("invalid difficulty"),
     };
 
@@ -50,7 +48,6 @@ async fn handler_hello(Json(params): Json<GameParams>) -> impl IntoResponse {
 
 #[derive(Debug, Deserialize)]
 struct GameParams {
-    board: Option<[[i32; 7]; 6]>,
+    board: Option<[[i8; 7]; 6]>,
     difficulty: Option<String>,
-    first_player: Option<i32>,
 }

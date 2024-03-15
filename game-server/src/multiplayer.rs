@@ -13,8 +13,8 @@ use serde_json::json;
 use std::{sync::atomic::AtomicU32, time::Instant};
 use tokio::sync::broadcast::{self, Sender};
 
-static GAME_ID_COUNTER: AtomicU32 = AtomicU32::new(0);
-static CHANNEL_CAPACITY: usize = 100;
+const GAME_ID_COUNTER: AtomicU32 = AtomicU32::new(0);
+const CHANNEL_CAPACITY: usize = 100;
 pub(crate) struct GameState {
     // game_id: u32,
     game_state: GameBoard,
@@ -24,10 +24,10 @@ pub(crate) struct GameState {
 }
 impl GameState {
     fn new() -> GameState {
-        GameState{
+        GameState {
             game_state: GameBoard::new(),
             update_event: broadcast::channel(CHANNEL_CAPACITY).0,
-            last_update: Instant::now()
+            last_update: Instant::now(),
         }
     }
 }
@@ -149,8 +149,8 @@ async fn make_move(
     };
 
     let player = match is_first {
-        true => GamePlayer::Opponent,
-        false => GamePlayer::Computer,
+        true => GamePlayer::FirstPlayer,
+        false => GamePlayer::SecondPlayer,
     };
 
     if game.game_state.current_player() != player {
