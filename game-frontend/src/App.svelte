@@ -3,14 +3,13 @@
   import GameSelector from "./lib/GameSelector.svelte";
   import { gameSettings } from "./lib/stores";
   import BotGameControl from "./lib/BotGameControl.svelte";
+  import MultiplayerControl from "./lib/MultiplayerControl.svelte";
 
   let gameInProg = false;
   let mode;
   gameSettings.subscribe((gs) => (mode = gs.mode));
   let winnerText = "";
   let game;
-
-  $: console.log(winnerText);
 
   function gameEnd(e) {
     if (e.detail.error) {
@@ -43,14 +42,16 @@
     <p>{winnerText}</p>
   {/if}
   {#if mode === 1}
-    <LocalGameControl bind:this={game} on:gameEnd={gameEnd} />
-  {:else if mode == 2}
     <BotGameControl
       bind:this={game}
       on:gameEnd={gameEnd}
-      botDiff={$gameSettings.botSettings.botDiff}
-      playerIsFirst={$gameSettings.botSettings.playerIsFirst}
+      botDiff={$gameSettings.modeSettings.botDiff}
+      playerIsFirst={$gameSettings.modeSettings.playerIsFirst}
     />
+  {:else if mode == 2}
+    <LocalGameControl bind:this={game} on:gameEnd={gameEnd} />
+  {:else if mode === 3}
+    <!-- <MultiplayerControl bind:this={game} on:gameEnd(gameEnd) /> -->
   {:else}
     <p>Error Please Refresh Page</p>
   {/if}
@@ -61,6 +62,7 @@
     height: 100vh;
     display: flex;
     flex-direction: column;
-    justify-content: space-between;
+    justify-content: space-around;
+    align-items: center;
   }
 </style>

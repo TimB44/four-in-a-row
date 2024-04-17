@@ -8,6 +8,9 @@
   export let botDiff = "easy";
   export let playerIsFirst = true;
 
+  // console.log(botDiff);
+  // console.log(playerIsFirst);
+
   const dispatch = createEventDispatcher();
 
   let disabled = Array(7).fill(false);
@@ -15,8 +18,6 @@
   let turns = 0;
   let buttons;
   let visualBoard;
-  console.log("in bot game control.");
-  console.log(`player is first: ${playerIsFirst}`);
 
   onMount(() => {
     buttons.disable();
@@ -49,14 +50,11 @@
 
     if (row === 5) disabled[col] = true;
 
-    //player is 1, ai is -1
-    let player =
-      (turns % 2 === 0 && playerIsFirst) || (turns % 2 === 1 && !playerIsFirst)
-        ? 1
-        : -1;
+
+    let player = turns % 2 === 0 ? 1 : -1;
 
     board[row][col] = player;
-    visualBoard.placePiece(row, col, player === 1 ? "red" : "blue");
+    visualBoard.placePiece(row, col, player == 1 ? "red" : "blue");
     turns++;
 
     let winner = gameIsOver(board);
@@ -66,17 +64,18 @@
       return;
     }
 
-    if (turns == 42) {
+    if (winner || turns == 42) {
       endGame("Draw");
       return;
     }
-    if (player == 1) {
+    if ((playerIsFirst && turns % 2 == 1) || (!playerIsFirst && turns % 2 == 0)) {
       playAIMove();
     } else {
       disabled.forEach((val, i) => buttons.setCol(i, val));
     }
   }
   async function playAIMove() {
+    console.log(botDiff);
     let start = Date.now();
     let promise = fetch("/ai", {
       method: "POST",
@@ -85,8 +84,7 @@
       },
       body: JSON.stringify({
         board: board,
-        difficulty: botDiff,
-        first_player: playerIsFirst ? 1 : -1,
+        difficulty:  botDiff,
       }),
     });
 

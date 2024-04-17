@@ -65,34 +65,6 @@
     }
   }
 
-  //   async function playAIMove() {
-  //     let start = Date.now();
-  //     let promise = fetch("/ai", {
-  //       method: "POST",
-  //       headers: {
-  //         "Content-Type": "application/json",
-  //       },
-  //       body: JSON.stringify({ board: board, difficulty: aiDifficulty }),
-  //     });
-
-  //     let resp = await promise;
-
-  //     let json = await resp.json();
-
-  //     let move = json["move"];
-  //     let dur = Date.now() - start;
-  //     if (dur < 2000) {
-  //       setTimeout(() => {
-  //         console.log("here");
-  //         playMove(move);
-  //       }, dur);
-  //     } else {
-  //       console.log("here");
-  //       playMove(move);
-  //     }
-  //   }
-
-  //Starts a new game session
   export function start() {
     clear();
   }

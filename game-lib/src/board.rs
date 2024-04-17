@@ -44,7 +44,9 @@ impl GameBoard {
         if self.is_over() {
             if let Some(game_move) = self.winning_move {
                 if game_move.0 != col {
-                    return Err("If the game is over can only remove the piece last played");
+                    return Err(
+                        "If the game is over you can only undo the winning move last played",
+                    );
                 }
             }
             self.winning_move = None;
@@ -200,14 +202,15 @@ impl GameBoard {
             }
 
             let modifier = match self.board[row - 1][col].expect("Error in current score logic") {
-                GamePlayer::FirstPlayer => -1,
-                GamePlayer::SecondPlayer => 1,
+                GamePlayer::FirstPlayer =>  1,
+                GamePlayer::SecondPlayer => -1,
             };
 
             total += 10_i32.pow((self.max_streak(col, row - 1)).into()) * modifier;
         }
-
+        println!("{:?}", total);
         total
+        
     }
 
     pub fn build(board: [[Option<GamePlayer>; 7]; 6]) -> Result<GameBoard, GameError> {

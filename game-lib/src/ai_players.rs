@@ -16,7 +16,7 @@ pub fn play_med(board: GameBoard) -> Result<GameMove, GameError> {
 
 /// Finds a move by performing a minimax game tree search with a depth of 8
 pub fn play_hard(board: GameBoard) -> Result<GameMove, GameError> {
-    minimax(board, 10)
+    minimax(board, 8)
 }
 
 #[cfg(test)]

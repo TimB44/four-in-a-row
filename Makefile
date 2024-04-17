@@ -4,3 +4,8 @@ build:
 	(cd game-server && cargo build)
 	rm -rf  game-server/static/
 	mv game-frontend/dist game-server/static 
+	gsed -i 's/crossorigin//g' game-server/static/index.html
+	gsed -i 's/\/assets/\/static\/assets/g' game-server/static/index.html
+
+run: build
+	(cd game-server && cargo run)

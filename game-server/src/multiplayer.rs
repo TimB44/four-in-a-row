@@ -13,8 +13,11 @@ use serde_json::json;
 use std::{sync::atomic::AtomicU32, time::Instant};
 use tokio::sync::broadcast::{self, Sender};
 
-const GAME_ID_COUNTER: AtomicU32 = AtomicU32::new(0);
 const CHANNEL_CAPACITY: usize = 100;
+const SECS_BETWEEN_CLEANUP: u64 = 60;
+const GAME_TIMEOUT_DURATION: u64 = 300;
+
+static GAME_ID_COUNTER: AtomicU32 = AtomicU32::new(0);
 pub(crate) struct GameState {
     // game_id: u32,
     game_state: GameBoard,
@@ -180,5 +183,24 @@ async fn make_move(
         Err(msg) => return (StatusCode::BAD_REQUEST, msg).into_response(),
     }
 
+    // If no one is listening that is fine
+    let _ = game.update_event.send(game.game_state.to_arr());
+    game.last_update = Instant::now();
+    
     StatusCode::OK.into_response()
+}
+
+pub(crate) fn start_cleanup(map: GameMap) -> tokio::task::JoinHandle<()> {
+    tokio::spawn(async move {
+        loop {
+            tokio::time::sleep(tokio::time::Duration::from_secs(SECS_BETWEEN_CLEANUP)).await;
+            let mut guard = map.lock().await;
+            println!("here: {}", guard.len());
+            let now = Instant::now();
+            guard.retain(|_, game| {
+                now.duration_since(game.last_update).as_secs() < GAME_TIMEOUT_DURATION
+            });
+            println!("here: {}", guard.len());
+        }
+    })
 }
