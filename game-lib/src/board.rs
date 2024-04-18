@@ -101,8 +101,17 @@ impl GameBoard {
             Some(player) => player,
         };
 
+        // Bottom branch
         let mut streak = 1;
         for i in (0..row).rev() {
+            if self.board[i][col] != Some(player) {
+                break;
+            }
+            streak += 1;
+        }
+
+        // Upper branch
+        for i in (row + 1)..7{
             if self.board[i][col] != Some(player) {
                 break;
             }
@@ -153,7 +162,7 @@ impl GameBoard {
         streak = max(streak, new_streak);
 
         //top left to bottom right diagonal
-        new_streak = 0;
+        new_streak = 1;
 
         //left branch
         let max_offset = min(5 - row, col);
