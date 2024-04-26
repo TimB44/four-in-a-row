@@ -19,18 +19,14 @@
 
   // If no gameID given then fetch one form the server and give player link
 
-  if (gameId == -1) {
-    let promise = fetch("/multiplayer/create_game", { method: "POST" });
-    promise
-      .then((resp) => resp.json().then((json) => (gameId = json["id"])))
-      .catch((res) => {
-        console.log(res);
-        throwError();
-      });
-  }
-
   onMount(() => {
-    buttons.disable();
+    if (playerIsFirst) {
+      buttons.enable();
+    } else {
+      buttons.disable();
+      getOpponentMove();
+    }
+    
   });
 
   /**
@@ -47,8 +43,6 @@
     dispatch("gameEnd", { error: true });
   }
 
-
-
   function playMove(col) {
     buttons.disable();
 
@@ -62,7 +56,8 @@
     board[row][col] = player;
     visualBoard.placePiece(row, col, player === 1 ? "red" : "blue");
     turns++;
-
+    
+    sendNewMove(col);
     let winner = gameIsOver(board);
 
     if (winner !== 0) {
@@ -74,38 +69,81 @@
       endGame("Draw");
       return;
     }
-    if (player == 1) {
-      getMove();
-    } else {
-      disabled.forEach((val, i) => buttons.setCol(i, val));
-    }
+    getOpponentMove();
   }
-  async function getMove() {
-    let start = Date.now();
-    let promise = fetch("/ai", {
+
+  async function sendNewMove(col) {
+    let resp = await fetch("/multiplayer/make_move", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
       },
       body: JSON.stringify({
-        board: board,
+        game_move: col,
+        is_first: playerIsFirst,
+        game_id: gameId,
+      }),
+    });
+
+    if (!resp.ok) {
+      console.log(await resp.blob());
+      throwError();
+    }
+    getOpponentMove();
+  }
+  async function getOpponentMove() {
+    let promise = fetch("/multiplayer/get_board", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        game_id: gameId,
         // difficulty: botDiff,
-        first_player: playerIsFirst ? 1 : -1,
+        current_board: board,
       }),
     });
 
     let resp = await promise;
 
+    if (!resp.ok) {
+      throwError();
+    }
+
     let json = await resp.json();
 
-    let move = json["move"];
-    let dur = Date.now() - start;
-    if (dur < 250) {
-      setTimeout(() => {
-        playMove(move);
-      }, 250 - dur);
+    let newBoard = json["board"];
+    playNewMoves(newBoard);
+    if (
+      (turns % 2 === 0 && playerIsFirst) ||
+      (turns % 2 === 1 && !playerIsFirst)
+    ) {
+      for (let i = 0; i < 7; i++) {
+        buttons.setCol(i, disabled[i]);
+      }
     } else {
-      playMove(move);
+      console.log("BAD"); //TODO REMOVE
+      getOpponentMove();
+    }
+  }
+
+  function playNewMoves(newBoard) {
+    for (let col = 0; col < 7; col++) {
+      for (let row = 0; row < 6; row++) {
+        if (newBoard[row][col] !== board[row][col]) {
+          if (board[row][col] !== 0) {
+            throwError();
+            return;
+          }
+          board[row][col] = newBoard[row][col];
+          visualBoard.placePiece(
+            row,
+            col,
+            board[row][col] === 1 ? "red" : "blue"
+          );
+          turns++;
+        }
+      }
     }
   }
 
@@ -113,7 +151,6 @@
   export function start() {
     if (!playerIsFirst) {
       buttons.disable();
-      getMove();
     } else {
       buttons.enable();
     }
@@ -137,17 +174,13 @@
 </script>
 
 <div>
-  <!-- {#if error}
-    <h1>Error</h1>
-  {:else}
-    <Board bind:this={visualBoard} />
-    <GameButtons
-      bind:this={buttons}
-      on:buttonClick={(e) => {
-        playMove(e.detail.col);
-      }}
-    ></GameButtons>
-  {/if} -->
+  <Board bind:this={visualBoard} />
+  <GameButtons
+    bind:this={buttons}
+    on:buttonClick={(e) => {
+      playMove(e.detail.col);
+    }}
+  ></GameButtons>
 </div>
 
 <style>

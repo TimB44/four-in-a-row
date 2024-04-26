@@ -6,8 +6,6 @@
 
   const dispatch = createEventDispatcher();
 
-
-
   let disabled = Array(7).fill(false);
   let board = Array.from({ length: 6 }, () => Array(7).fill(0));
   let turns = 0;
@@ -89,7 +87,9 @@
   <Board bind:this={visualBoard} />
   <GameButtons
     bind:this={buttons}
-    on:buttonClick={(e) => {playMove(e.detail.col);}}
+    on:buttonClick={(e) => {
+      playMove(e.detail.col);
+    }}
   ></GameButtons>
 </div>
 

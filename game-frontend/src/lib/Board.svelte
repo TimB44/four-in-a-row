@@ -12,7 +12,7 @@
 </script>
 
 <!-- some svg code adapted form https://rossta.net/blog/connect-four-with-svg-pattern-masking.html -->
-<svg width="350px" viewBox="0 0 700 700" xmlns="http://www.w3.org/2000/svg">
+<svg viewBox="0 0 700 700" xmlns="http://www.w3.org/2000/svg">
 
     <defs>
       <pattern id="cell-pattern" patternUnits="userSpaceOnUse" width="100" height="100">
@@ -33,7 +33,7 @@
 
 <style>
     svg {
-        width: 50vw;
-        height: 70vh;
+        width: 700px;
+        height: 700px;
     }
 </style>

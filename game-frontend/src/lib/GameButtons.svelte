@@ -41,7 +41,18 @@
 </div>
 
 <style>
+    div {
+      width: 700px;
+        height: 100px;
+      display: flex;
+      flex-direction: row;
+      align-items: stretch;
+      justify-content: center;
+      flex-grow: 1;
+    }
     button {
-        background-color: #d9d9d9;
+      background-color: #313131;
+      width: 100%;
+      margin: 5px;
     }
 </style>
