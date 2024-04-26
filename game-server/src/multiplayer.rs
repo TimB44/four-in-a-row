@@ -2,7 +2,7 @@ use axum::{
     extract::State,
     http::StatusCode,
     response::IntoResponse,
-    routing::{get, post},
+    routing::post,
     Json, Router,
 };
 
@@ -35,17 +35,19 @@ impl GameState {
     }
 }
 
-#[derive(Deserialize)]
-struct GetBoardParams {
-    game_id: Option<u32>,
-    current_board: Option<[[i8; 7]; 6]>,
-}
+
 
 pub(crate) fn routes() -> Router<GameMap> {
     Router::new()
         .route("/create_game", post(create_game))
-        .route("/get_board", get(get_next_update))
+        .route("/get_board", post(get_next_update))
         .route("/make_move", post(make_move))
+}
+
+#[derive(Deserialize)]
+struct GetBoardParams {
+    game_id: Option<u32>,
+    current_board: Option<[[i8; 7]; 6]>,
 }
 
 async fn create_game(State(games): State<GameMap>) -> impl IntoResponse {
@@ -102,6 +104,7 @@ async fn get_next_update(
         }
     };
 
+    println!("Here with board: {:?}", update);
     Json(json!({"board" : update})).into_response()
 }
 

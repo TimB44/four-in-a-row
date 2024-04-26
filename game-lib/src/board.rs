@@ -111,7 +111,7 @@ impl GameBoard {
         }
 
         // Upper branch
-        for i in (row + 1)..7{
+        for i in (row + 1)..6{
             if self.board[i][col] != Some(player) {
                 break;
             }
@@ -211,13 +211,12 @@ impl GameBoard {
             }
 
             let modifier = match self.board[row - 1][col].expect("Error in current score logic") {
-                GamePlayer::FirstPlayer =>  1,
-                GamePlayer::SecondPlayer => -1,
+                GamePlayer::FirstPlayer =>  -1,
+                GamePlayer::SecondPlayer => 1,
             };
 
             total += 10_i32.pow((self.max_streak(col, row - 1)).into()) * modifier;
         }
-        println!("{:?}", total);
         total
         
     }

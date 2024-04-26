@@ -61,11 +61,11 @@ fn min_player(
     depth: u8,
 ) -> Result<i32, GameError> {
     if depth == 0 || board.is_over() {
-        return Ok(board.current_score());
+        return Ok(board.current_score() * (depth + 1) as i32);
     }
 
     let mut min = i32::MAX;
-    for possible_move in board.moves() {
+    for possible_move in board.moves()  {
         board.make_move(&possible_move)?;
 
         min = cmp::min(max_player(board, alpha, beta, depth - 1)?, min);
@@ -86,7 +86,7 @@ fn max_player(
     depth: u8,
 ) -> Result<i32, GameError> {
     if depth == 0 || board.is_over() {
-        return Ok(board.current_score());
+        return Ok(board.current_score() * (depth + 1) as i32);
     }
 
     let mut max = i32::MIN;
