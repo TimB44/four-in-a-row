@@ -60,7 +60,9 @@
 {/if}
 <Board
   bind:this={board}
-  on:playerMove={playAIMove}
+  on:playerMove={() => {
+    if (!board.gameOver()) playAIMove();
+  }}
   on:error
   on:gameEnd={(e) => {
     gameOverText = e.detail.message;

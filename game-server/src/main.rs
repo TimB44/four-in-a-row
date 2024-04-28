@@ -26,7 +26,7 @@ async fn main() {
         .nest_service("/static", ServeDir::new("static"));
 
     //"127.0.0.1:8080"
-    let listener = TcpListener::bind("127.0.0.1:8080") //192.168.86.21:8080 127.0.0.1:8080
+    let listener = TcpListener::bind("0.0.0.0:8080") //192.168.86.21:8080 127.0.0.1:8080
         .await
         .expect("Could not create the tcp listener");
     println!("->> LISTENING on {:?} \n", listener.local_addr());
