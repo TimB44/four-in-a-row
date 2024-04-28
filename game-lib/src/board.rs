@@ -1,16 +1,26 @@
+//! # Board Module
+//!
+//! This module contains the Structs and enums used the represent the
+//! connect 4 board.
+
 use crate::GameError;
 use std::cmp::{max, min};
+
 #[cfg(test)]
 mod game_board_tests;
 
+/// Represents a valid connect 4 game that could be over. This struct
+/// contains many methods which allow for the game to progress though
+/// playing moves.
 #[derive(Debug, Clone, Copy)]
 pub struct GameBoard {
-    board: [[Option<GamePlayer>; 7]; 6], // board[0] is the bottom row
+    board: [[Option<GamePlayer>; 7]; 6],
     total_moves: u8,
     winning_move: Option<GameMove>,
 }
 
 impl GameBoard {
+    /// Returns an empty board with no pieces played
     pub fn new() -> GameBoard {
         GameBoard {
             board: [[None; 7]; 6],
@@ -18,6 +28,12 @@ impl GameBoard {
             winning_move: None,
         }
     }
+
+    /// Attempts to make the given move on the board
+    ///
+    /// # Errors
+    /// - If the game is already over
+    /// - If the column the piece is attempting to be placed into is full
     pub fn make_move(&mut self, game_move: &GameMove) -> Result<(), GameError> {
         let col = game_move.0 as usize;
         if self.is_over() {
@@ -39,6 +55,12 @@ impl GameBoard {
         Err("Can not make move because given column is full")
     }
 
+    /// Undoes the given move on the board
+    ///
+    /// # Errors
+    /// - The move cannot be undone while maintaining a correct board
+    /// - If the previous move caused a win, then the move being undone must be the last move
+    ///
     pub fn undo_move(&mut self, game_move: &GameMove) -> Result<(), GameError> {
         let col = game_move.0;
         if self.is_over() {
@@ -66,6 +88,7 @@ impl GameBoard {
         Err("No pieces in the given column to remove")
     }
 
+    /// Returns the player whose turn it is
     pub fn current_player(&self) -> GamePlayer {
         if self.total_moves % 2 == 0 {
             GamePlayer::FirstPlayer
@@ -74,10 +97,12 @@ impl GameBoard {
         }
     }
 
+    /// Returns true if the game is over, false if not
     pub fn is_over(&self) -> bool {
         self.winning_move.is_some() || self.total_moves == 42
     }
 
+    /// Return the winner if the game is over, or None if the game is in progress
     pub fn winner(&self) -> Option<GamePlayer> {
         if !self.is_over() || self.total_moves == 42 {
             return None;
@@ -86,6 +111,7 @@ impl GameBoard {
         Some(self.current_player().other())
     }
 
+    /// Returns a vector with all of the valid moves
     pub fn moves<'a>(&'a self) -> Vec<GameMove> {
         self.board[5]
             .iter()
@@ -111,7 +137,7 @@ impl GameBoard {
         }
 
         // Upper branch
-        for i in (row + 1)..6{
+        for i in (row + 1)..6 {
             if self.board[i][col] != Some(player) {
                 break;
             }
@@ -211,16 +237,24 @@ impl GameBoard {
             }
 
             let modifier = match self.board[row - 1][col].expect("Error in current score logic") {
-                GamePlayer::FirstPlayer =>  -1,
+                GamePlayer::FirstPlayer => -1,
                 GamePlayer::SecondPlayer => 1,
             };
 
             total += 10_i32.pow((self.max_streak(col, row - 1)).into()) * modifier;
         }
         total
-        
     }
 
+    /// Builds a GameBoard from the given 2d Array
+    ///
+    /// # Errors
+    /// This function will return a string error if the given board is not a valid
+    /// in progress connect 4 game. Below are some ways a board can be invalid
+    /// - The Game is already over ei. Tie or 4 in a row
+    /// - The Board contains floating pieces
+    /// - The Board contains an invalid number of either players piece
+    ///
     pub fn build(board: [[Option<GamePlayer>; 7]; 6]) -> Result<GameBoard, GameError> {
         //check for invalid number of pieces
         let mut first_count: i32 = 0;
@@ -279,6 +313,16 @@ impl GameBoard {
         Ok(board)
     }
 
+    /// Test if the board when converted to a 2d array is equal the given board
+    ///
+    /// # Format of The Board
+    /// The board is a 2d array of signed bytes. The outer array holds the array of rows.
+    /// the first row is `board[0]`
+    ///
+    /// The pieces are represented as follows
+    /// - O represents an empty spot
+    /// - 1 represents a piece from the first player
+    /// - -1 represents a piece from the second player
     pub fn equals_arr(&self, prev_board: &[[i8; 7]; 6]) -> bool {
         for row in 0..6 {
             for col in 0..7 {
@@ -296,6 +340,16 @@ impl GameBoard {
         true
     }
 
+    /// Converts the board into an array
+    /// 
+    /// # Format of The Board
+    /// The board is a 2d array of signed bytes. The outer array holds the array of rows.
+    /// the first row is `board[0]`
+    ///
+    /// The pieces are represented as follows
+    /// - O represents an empty spot
+    /// - 1 represents a piece from the first player
+    /// - -1 represents a piece from the second player
     pub fn to_arr(&self) -> [[i8; 7]; 6] {
         let mut arr = [[0; 7]; 6];
         for row in 0..6 {
@@ -310,12 +364,14 @@ impl GameBoard {
     }
 }
 
+/// Enum which represents the different player in the game
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum GamePlayer {
     FirstPlayer,
     SecondPlayer,
 }
 impl GamePlayer {
+    /// Returns the other player in the game 
     pub fn other(&self) -> Self {
         match self {
             Self::FirstPlayer => Self::SecondPlayer,
@@ -323,6 +379,8 @@ impl GamePlayer {
         }
     }
 
+    /// Converts the player into its signed bytes representation
+    /// used in a 2d array
     pub fn to_int(&self) -> i8 {
         match self {
             GamePlayer::FirstPlayer => 1,
@@ -331,18 +389,31 @@ impl GamePlayer {
     }
 }
 
+/// Represents a valid game move. This requirement guarantees that 
+/// the move will be in the range of [0, 7)
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub struct GameMove(u8);
 
 impl GameMove {
+    /// Returns the column associated with this move
     pub fn get_col(&self) -> u8 {
         self.0
     }
 
+    /// Builds a GameMove with no check
+    /// 
+    /// # Unsafe
+    /// When using this you must guarantee yourself that the provided column is in the 
+    /// range of [0, 7). Failing to do so could cause a panic when using the move
+    /// 
     unsafe fn build_unchecked(col: i32) -> Self {
         GameMove(col as u8)
     }
 
+    /// Builds a gameMove from the given column
+    /// 
+    /// # Errors
+    /// If the move is not in the range of [0, 7)
     pub fn build(col: u8) -> Result<GameMove, &'static str> {
         if col < 7 {
             Ok(GameMove(col))

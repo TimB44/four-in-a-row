@@ -21,7 +21,7 @@ async fn main() {
     let routes_hello = Router::new()
         .nest("/multiplayer", multiplayer::routes())
         .with_state(state)
-        .route("/ai", post(handler_hello))
+        .route("/ai", post(get_ai_move))
         .nest_service("/", ServeFile::new("static/index.html"))
         .nest_service("/static", ServeDir::new("static"));
 
@@ -34,7 +34,7 @@ async fn main() {
     axum::serve(listener, routes_hello).await.unwrap();
 }
 
-async fn handler_hello(Json(params): Json<GameParams>) -> impl IntoResponse {
+async fn get_ai_move(Json(params): Json<GameParams>) -> impl IntoResponse {
     println!("->> {:<12} - handler_hello - {params:?}", "HANDLER");
 
     let dif = params.difficulty.as_deref().unwrap_or("BAD");
