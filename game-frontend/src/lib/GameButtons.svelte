@@ -14,12 +14,12 @@
    * disables/enables the button at the specified column
    *
    * @param {number} col
-   * @param {boolean} val
+   * @param {boolean} disable
    */
-  export function setCol(col, val) {
+  export function setCol(col, disable) {
     if (col < 0 || col > 6) return;
 
-    buttons[col].disabled = val;
+    buttons[col].disabled = disable;
   }
   
   /**
@@ -30,7 +30,6 @@
     if (col < 0 || col > 6) return;
 
     dispatch("buttonClick", {col: col});
-
   }
 </script>
 

@@ -3,17 +3,10 @@
   import { onMount } from "svelte";
   import { gameSettings } from "./stores";
 
-  let dispatch = createEventDispatcher();
-
   // import { scale } from "svelte/transition";
-  let settings = {};
+  let modeSettings = {};
+  modeSettings = { playerIsFirst: true, botDiff: "easy" };
   let mode = 1;
-
-  // $: console.log(settings);
-  $: gameSettings.set({ mode, modeSettings: settings });
-
-  //TODO change
-  let firstBtn;
 
   // Extract the URL parameters if they exist
   let params = new URLSearchParams(document.location.search);
@@ -24,14 +17,15 @@
   history.pushState(null, "", location.href.split("?")[0]);
 
 
+  // Auto load game ID if in the URL
   onMount(() => {
     if (!isNaN(id)) {
       let isFir = first === "1";
 
-      settings = { id, playerIsFirst: isFir };
+      modeSettings = { id, playerIsFirst: isFir };
       mode = 3;
     } else {
-      settings = { playerIsFirst: true, botDiff: "easy" };
+      modeSettings = { playerIsFirst: true, botDiff: "easy" };
     }
   });
 
@@ -50,34 +44,35 @@
     return json["id"];
   }
 
-  function copyUrlToClipboard(
-    event: MouseEvent & { currentTarget: EventTarget & HTMLButtonElement }
-  ) {
+  function copyUrlToClipboard() {
     let url = window.location.href;
-    let urlParams = `?id=${settings["id"]}&fir=${settings["playerIsFirst"] === true ? 0 : 1}`;
+    let urlParams = `?id=${modeSettings["id"]}&fir=${modeSettings["playerIsFirst"] === true ? 0 : 1}`;
     navigator.clipboard.writeText(url + urlParams);
+  }
+
+  function submitClicked(){
+    $gameSettings = {mode, modeSettings};
   }
 </script>
 
 <div id="container">
   <div class="modeButtons">
     <button
-      bind:this={firstBtn}
       on:click={() => {
         mode = 1;
-        settings = { playerIsFirst: true, botDiff: "easy" };
+        modeSettings = { playerIsFirst: true, botDiff: "easy" };
       }}>Single Player</button
     >
     <button
       on:click={() => {
         mode = 2;
-        settings = {};
+        modeSettings = {};
       }}>Local Multiplayer</button
     >
     <button
       on:click={() => {
         mode = 3;
-        settings = { id: "None", playerIsFirst: true };
+        modeSettings = { id: "None", playerIsFirst: true };
       }}>Online Multiplayer</button
     >
   </div>
@@ -87,20 +82,20 @@
       <h3>Choose Your Color</h3>
       <label>
         <input
-          checked={settings["playerIsFirst"] === true}
+          checked={modeSettings["playerIsFirst"] === true}
           name="color"
           type="radio"
-          bind:group={settings["playerIsFirst"]}
+          bind:group={modeSettings["playerIsFirst"]}
           value={true}
         />
         Red
       </label>
       <label>
         <input
-          checked={settings["playerIsFirst"] === false}
+          checked={modeSettings["playerIsFirst"] === false}
           name="color"
           type="radio"
-          bind:group={settings["playerIsFirst"]}
+          bind:group={modeSettings["playerIsFirst"]}
           value={false}
         />
         Blue
@@ -110,30 +105,30 @@
 
       <label>
         <input
-          checked={settings["botDiff"] === "easy"}
+          checked={modeSettings["botDiff"] === "easy"}
           name="AiDifficulty"
           type="radio"
-          bind:group={settings["botDiff"]}
+          bind:group={modeSettings["botDiff"]}
           value={"easy"}
         />
         Easy
       </label>
       <label>
         <input
-          checked={settings["botDiff"] === "medium"}
+          checked={modeSettings["botDiff"] === "medium"}
           name="AiDifficulty"
           type="radio"
-          bind:group={settings["botDiff"]}
+          bind:group={modeSettings["botDiff"]}
           value={"medium"}
         />
         Medium
       </label>
       <label>
         <input
-          checked={settings["botDiff"] === "hard"}
+          checked={modeSettings["botDiff"] === "hard"}
           name="AiDifficulty"
           type="radio"
-          bind:group={settings["botDiff"]}
+          bind:group={modeSettings["botDiff"]}
           value={"hard"}
         />
         Hard
@@ -144,35 +139,36 @@
       <h3>Choose Your Color</h3>
       <label>
         <input
-          checked={settings["playerIsFirst"] === true}
+          checked={modeSettings["playerIsFirst"] === true}
           name="color"
           type="radio"
-          bind:group={settings["playerIsFirst"]}
+          bind:group={modeSettings["playerIsFirst"]}
           value={true}
         />
         Red
       </label>
       <label>
         <input
-          checked={settings["playerIsFirst"] === false}
+          checked={modeSettings["playerIsFirst"] === false}
           name="color"
           type="radio"
-          bind:group={settings["playerIsFirst"]}
+          bind:group={modeSettings["playerIsFirst"]}
           value={false}
         />
         Blue
       </label>
       <h3>Game ID</h3>
-      <p contenteditable="false" bind:innerText={settings["id"]}></p>
+      <p contenteditable="false" bind:innerText={modeSettings["id"]}></p>
       <button
         on:click={() => {
-          getGameId().then((id) => (settings["id"] = id));
+          getGameId().then((id) => (modeSettings["id"] = id));
         }}>Get ID</button
       >
       <button on:click={copyUrlToClipboard}>Copy URL for opponent</button>
+      <span>{`?id=${modeSettings["id"]}&fir=${modeSettings["playerIsFirst"] === true ? 0 : 1}`}</span>
     </div>
   {/if}
-  <button on:click={() => dispatch("gameStart")}>play</button>
+  <button on:click={submitClicked}>Play</button>
 </div>
 <style>
   #container {

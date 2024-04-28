@@ -5,20 +5,14 @@
   import BotGameControl from "./lib/BotGameControl.svelte";
   import MultiplayerControl from "./lib/MultiplayerControl.svelte";
   import { fade } from "svelte/transition";
-  let gameInProg = false;
-  let mode;
-  gameSettings.subscribe((gs) => (mode = gs.mode));
-  let winnerText = "";
-  let game;
 
-  function gameEnd(e) {
-    if (e.detail.error) {
-      winnerText = `Error: ${e.detail.message}`;
-    } else {
-      winnerText = e.detail.message;
-    }
-
-    gameInProg = false;
+  function handleError(e) {
+    console.error(e.detail.message);
+    alert("Error: Page will be refreshed");
+    location.reload();
+  }
+  function returnToMenu() {
+    gameSettings.set({ mode: 0, modeSettings: {} });
   }
 </script>
 
@@ -27,37 +21,27 @@
 </head>
 <main>
   <h1>Four In a Row</h1>
-
-  {#if !gameInProg}
-    <div transition:fade={{ delay: gameInProg ? 1000 : 0, duration: 600 }}>
-      <GameSelector
-        on:gameStart={(e) => {
-          gameInProg = true;
-          game.start();
-        }}
-      />
+  {#if $gameSettings.mode === 0}
+    <div transition:fade={{ delay: 300, duration: 600 }}>
+      <GameSelector />
     </div>
-  {/if}
-  {#if winnerText !== ""}
-    <p>{winnerText}</p>
-  {/if}
-  {#if mode === 1 && gameInProg}
-    <div transition:fade={{ delay: gameInProg ? 0 : 1000, duration: 600 }}>
+  {:else if $gameSettings.mode === 1}
+    <div transition:fade={{ delay: 300, duration: 600 }}>
       <BotGameControl
-        bind:this={game}
-        on:gameEnd={gameEnd}
+        on:error={handleError}
+        on:menuClicked={returnToMenu}
         botDiff={$gameSettings.modeSettings.botDiff}
         playerIsFirst={$gameSettings.modeSettings.playerIsFirst}
       />
     </div>
-  {:else if mode === 2 && gameInProg}
-    <div transition:fade={{ delay: gameInProg ? 0 : 1000, duration: 600 }}>
-      <LocalGameControl bind:this={game} on:gameEnd={gameEnd} />
+  {:else if $gameSettings.mode === 2}
+    <div transition:fade={{ delay: 300, duration: 600 }}>
+      <LocalGameControl on:error={handleError} on:menuClicked={returnToMenu} />
     </div>
-  {:else if mode === 3 && gameInProg}
-    <div transition:fade={{ delay: gameInProg ? 0 : 1000, duration: 600 }}>
+  {:else if $gameSettings.mode === 3}
+    <div transition:fade={{ delay: 300, duration: 600 }}>
       <MultiplayerControl
-        bind:this={game}
+        on:menuClicked={returnToMenu}
         on:gameEnd(gameEnd)
         playerIsFirst={$gameSettings.modeSettings["playerIsFirst"]}
         gameId={$gameSettings.modeSettings["id"]}
