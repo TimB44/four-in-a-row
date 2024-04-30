@@ -9,3 +9,9 @@ build:
 
 run: build
 	(cd game-server && cargo run)
+
+build-docker: build
+	docker build -t game-server  -f game-server/Dockerfile .
+
+run-docker: 
+	docker run -p 8080:8080 game-server

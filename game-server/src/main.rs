@@ -1,4 +1,4 @@
-use axum::{http::StatusCode, response::IntoResponse, routing::post, Json, Router};
+use axum::{http::{StatusCode, Uri}, response::IntoResponse, routing::post, Json, Router};
 use multiplayer::start_cleanup;
 use serde::Deserialize;
 use serde_json::json;
@@ -18,12 +18,13 @@ async fn main() {
     let state: Arc<Mutex<HashMap<u32, GameState>>> = Arc::new(Mutex::new(HashMap::new()));
     start_cleanup(Arc::clone(&state));
 
-    let routes_hello = Router::new()
+    let routes = Router::new()
         .nest("/multiplayer", multiplayer::routes())
         .with_state(state)
         .route("/ai", post(get_ai_move))
         .nest_service("/", ServeFile::new("static/index.html"))
-        .nest_service("/static", ServeDir::new("static"));
+        .nest_service("/static", ServeDir::new("static"))
+        .fallback(handle_fallback);
 
     //"127.0.0.1:8080"
     let listener = TcpListener::bind("0.0.0.0:8080") //192.168.86.21:8080 127.0.0.1:8080
@@ -31,7 +32,11 @@ async fn main() {
         .expect("Could not create the tcp listener");
     println!("->> LISTENING on {:?} \n", listener.local_addr());
 
-    axum::serve(listener, routes_hello).await.unwrap();
+    axum::serve(listener, routes).await.unwrap();
+}
+
+async fn handle_fallback(uri: Uri){
+    println!("In fallback, uri: {:?}", uri);
 }
 
 async fn get_ai_move(Json(params): Json<GameParams>) -> impl IntoResponse {
