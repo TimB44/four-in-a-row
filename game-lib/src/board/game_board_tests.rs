@@ -241,7 +241,6 @@ fn right_diagonal_down_streak() {
 
     assert_eq!(gb.max_streak(0, 1), 2);
     assert_eq!(gb.max_streak(1, 0), 2);
-    
 
     let mut board = [[None; 7]; 6];
     board[1][0] = Some(GamePlayer::SecondPlayer);
@@ -292,7 +291,6 @@ fn horizontal_streak_win() {
     board[0][3] = Some(GamePlayer::SecondPlayer);
     board[0][4] = Some(GamePlayer::SecondPlayer);
 
-
     let mut gb = GameBoard::build(board).unwrap();
 
     assert!(!gb.is_over());
@@ -301,4 +299,143 @@ fn horizontal_streak_win() {
     for i in 2..=5 {
         assert_eq!(gb.max_streak(i, 0), 4);
     }
+}
+
+#[test]
+fn left_down_streak() {
+    let mut board = [[None; 7]; 6];
+
+    board[0][1] = Some(GamePlayer::SecondPlayer);
+    board[0][2] = Some(GamePlayer::FirstPlayer);
+    board[0][3] = Some(GamePlayer::SecondPlayer);
+    board[0][4] = Some(GamePlayer::SecondPlayer);
+    board[0][5] = Some(GamePlayer::FirstPlayer);
+    board[0][6] = Some(GamePlayer::FirstPlayer);
+
+    board[1][1] = Some(GamePlayer::SecondPlayer);
+    board[1][2] = Some(GamePlayer::FirstPlayer);
+    board[1][3] = Some(GamePlayer::FirstPlayer);
+    board[1][4] = Some(GamePlayer::FirstPlayer);
+
+    board[2][2] = Some(GamePlayer::SecondPlayer);
+    board[2][3] = Some(GamePlayer::FirstPlayer);
+
+    board[3][3] = Some(GamePlayer::SecondPlayer);
+
+    let mut gb = GameBoard::build(board).unwrap();
+
+    assert!(!gb.is_over());
+
+    gb.make_move(&GameMove::build(0).unwrap()).unwrap();
+
+    assert_eq!(gb.max_streak(0, 0), 4);
+    assert!(gb.is_over());
+}
+
+
+#[test]
+fn right_down_streak() {
+    let mut board = [[None; 7]; 6];
+
+    board[0][5] = Some(GamePlayer::SecondPlayer);
+    board[0][4] = Some(GamePlayer::FirstPlayer);
+    board[0][3] = Some(GamePlayer::SecondPlayer);
+    board[0][2] = Some(GamePlayer::SecondPlayer);
+    board[0][1] = Some(GamePlayer::FirstPlayer);
+    board[0][0] = Some(GamePlayer::FirstPlayer);
+
+    board[1][5] = Some(GamePlayer::SecondPlayer);
+    board[1][4] = Some(GamePlayer::FirstPlayer);
+    board[1][3] = Some(GamePlayer::FirstPlayer);
+    board[1][2] = Some(GamePlayer::FirstPlayer);
+
+    board[2][4] = Some(GamePlayer::SecondPlayer);
+    board[2][3] = Some(GamePlayer::FirstPlayer);
+
+    board[3][3] = Some(GamePlayer::SecondPlayer);
+
+    let mut gb = GameBoard::build(board).unwrap();
+
+    assert!(!gb.is_over());
+
+    gb.make_move(&GameMove::build(6).unwrap()).unwrap();
+
+    assert_eq!(gb.max_streak(6, 0), 4);
+    assert!(gb.is_over());
+}
+
+
+#[test]
+fn current_score_equal(){
+    let mut board = [[None; 7]; 6];
+    board[0][0] = Some(GamePlayer::FirstPlayer);
+    board[0][1] = Some(GamePlayer::FirstPlayer);
+
+    board[0][2] = Some(GamePlayer::SecondPlayer);
+    board[0][3] = Some(GamePlayer::SecondPlayer);
+
+    let gb = GameBoard::build(board).unwrap();
+    assert_eq!(gb.current_score(), 0);
+}
+
+
+#[test]
+fn current_score_player_one_winning(){
+    let mut board = [[None; 7]; 6];
+    board[0][0] = Some(GamePlayer::FirstPlayer);
+    board[0][1] = Some(GamePlayer::FirstPlayer);
+
+    board[0][2] = Some(GamePlayer::SecondPlayer);
+    board[0][4] = Some(GamePlayer::SecondPlayer);
+
+    let gb = GameBoard::build(board).unwrap();
+    assert_eq!(gb.current_score(), -180);
+}
+
+#[test]
+fn current_score_player_two_winning(){
+    let mut board = [[None; 7]; 6];
+    board[0][0] = Some(GamePlayer::FirstPlayer);
+    board[0][2] = Some(GamePlayer::FirstPlayer);
+
+    board[0][3] = Some(GamePlayer::SecondPlayer);
+    board[0][4] = Some(GamePlayer::SecondPlayer);
+
+    let gb = GameBoard::build(board).unwrap();
+    assert_eq!(gb.current_score(), 180);
+}
+
+#[test]
+fn player_one_win(){
+    let mut board = [[None; 7]; 6];
+    board[0][0] = Some(GamePlayer::FirstPlayer);
+    board[1][0] = Some(GamePlayer::FirstPlayer);
+    board[2][0] = Some(GamePlayer::FirstPlayer);
+    
+
+    board[0][3] = Some(GamePlayer::SecondPlayer);
+    board[0][4] = Some(GamePlayer::SecondPlayer);
+    board[0][5] = Some(GamePlayer::SecondPlayer);
+    
+    let mut gb = GameBoard::build(board).unwrap();
+    gb.make_move(&GameMove::build(0).unwrap()).unwrap();
+    assert_eq!(gb.current_score(), -10000);
+}
+
+#[test]
+fn player_two_win(){
+    let mut board = [[None; 7]; 6];
+    board[0][0] = Some(GamePlayer::FirstPlayer);
+    board[0][1] = Some(GamePlayer::FirstPlayer);
+    board[1][0] = Some(GamePlayer::FirstPlayer);
+    board[2][0] = Some(GamePlayer::FirstPlayer);
+    
+
+    board[0][3] = Some(GamePlayer::SecondPlayer);
+    board[0][4] = Some(GamePlayer::SecondPlayer);
+    board[0][5] = Some(GamePlayer::SecondPlayer);
+    
+    let mut gb = GameBoard::build(board).unwrap();
+    gb.make_move(&GameMove::build(6).unwrap()).unwrap();
+    assert_eq!(gb.current_score(), 10000);
 }

@@ -20,7 +20,6 @@ pub fn play_med(board: GameBoard) -> Result<GameMove, GameError> {
 pub fn play_hard(board: GameBoard) -> Result<GameMove, GameError> {
     let i = Instant::now();
     let r = minimax(board, 9);
-
     println!("{:?}", i.elapsed());
     r
 }
@@ -30,7 +29,7 @@ mod tests {
 
     use crate::{
         ai_players::*,
-        board::{GameBoard, GameMove, GamePlayer}, next_hard_move,
+        board::{GameBoard, GamePlayer},
     };
 
     #[test]

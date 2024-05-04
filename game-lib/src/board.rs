@@ -4,7 +4,7 @@
 //! connect 4 board.
 
 use crate::GameError;
-use std::cmp::{max, min};
+use std::cmp::{self, max, min};
 
 #[cfg(test)]
 mod game_board_tests;
@@ -228,22 +228,40 @@ impl GameBoard {
         let mut total = 0;
 
         for col in 0..7 {
-            let mut row = 0;
-            while row < 6 && self.board[row][col].is_some() {
-                row += 1;
+            for row in 0..6 {
+                if self.board[row][col].is_some()
+                    && (self.board[cmp::min(row + 1, 5)][col].is_none()
+                        || self.board[row][cmp::min(col + 1, 6)].is_none()
+                        || self.board[row][cmp::max((col as isize) - 1, 0) as usize].is_none())
+                {
+                    let modifier =
+                        match self.board[row][col].expect("Error in current score logic") {
+                            GamePlayer::FirstPlayer => -1,
+                            GamePlayer::SecondPlayer => 1,
+                        };
+                    total += 10_i32.pow((self.max_streak(col, row )).into()) * modifier;
+                }
             }
-            if row == 6 || row == 0 {
-                continue;
-            }
-
-            let modifier = match self.board[row - 1][col].expect("Error in current score logic") {
-                GamePlayer::FirstPlayer => -1,
-                GamePlayer::SecondPlayer => 1,
-            };
-
-            total += 10_i32.pow((self.max_streak(col, row - 1)).into()) * modifier;
         }
         total
+
+        // for col in 0..7 {
+        //     let mut row = 0;
+        //     while row < 6 && self.board[row][col].is_some() {
+        //         row += 1;
+        //     }
+        //     if row == 6 || row == 0 {
+        //         continue;
+        //     }
+
+        //     let modifier = match self.board[row - 1][col].expect("Error in current score logic") {
+        //         GamePlayer::FirstPlayer => -1,
+        //         GamePlayer::SecondPlayer => 1,
+        //     };
+
+        //     total += 10_i32.pow((self.max_streak(col, row - 1)).into()) * modifier;
+        // }
+        // total
     }
 
     /// Builds a GameBoard from the given 2d Array
@@ -341,7 +359,7 @@ impl GameBoard {
     }
 
     /// Converts the board into an array
-    /// 
+    ///
     /// # Format of The Board
     /// The board is a 2d array of signed bytes. The outer array holds the array of rows.
     /// the first row is `board[0]`
@@ -371,7 +389,7 @@ pub enum GamePlayer {
     SecondPlayer,
 }
 impl GamePlayer {
-    /// Returns the other player in the game 
+    /// Returns the other player in the game
     pub fn other(&self) -> Self {
         match self {
             Self::FirstPlayer => Self::SecondPlayer,
@@ -389,7 +407,7 @@ impl GamePlayer {
     }
 }
 
-/// Represents a valid game move. This requirement guarantees that 
+/// Represents a valid game move. This requirement guarantees that
 /// the move will be in the range of [0, 7)
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub struct GameMove(u8);
@@ -401,17 +419,17 @@ impl GameMove {
     }
 
     /// Builds a GameMove with no check
-    /// 
+    ///
     /// # Unsafe
-    /// When using this you must guarantee yourself that the provided column is in the 
+    /// When using this you must guarantee yourself that the provided column is in the
     /// range of [0, 7). Failing to do so could cause a panic when using the move
-    /// 
+    ///
     unsafe fn build_unchecked(col: i32) -> Self {
         GameMove(col as u8)
     }
 
     /// Builds a gameMove from the given column
-    /// 
+    ///
     /// # Errors
     /// If the move is not in the range of [0, 7)
     pub fn build(col: u8) -> Result<GameMove, &'static str> {
