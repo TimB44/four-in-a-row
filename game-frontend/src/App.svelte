@@ -5,6 +5,8 @@
   import BotGameControl from "./lib/BotGameControl.svelte";
   import MultiplayerControl from "./lib/MultiplayerControl.svelte";
   import { fade } from "svelte/transition";
+  import Header from "./lib/Header.svelte";
+  // import { crossfade } from "svelte/transition";
 
   function handleError(e) {
     console.error(e.detail.message);
@@ -15,12 +17,12 @@
     gameSettings.set({ mode: 0, modeSettings: {} });
   }
 </script>
-
+<!-- 
 <head>
   <title>Four In a Row</title>
-</head>
-<main>
-  <h1>Four In a Row</h1>
+</head> -->
+
+  <Header/>
   {#if $gameSettings.mode === 0}
     <div transition:fade={{ delay: 300, duration: 600 }}>
       <GameSelector />
@@ -48,14 +50,7 @@
       />
     </div>
   {/if}
-</main>
+
 
 <style>
-  main {
-    height: 100vh;
-    display: flex;
-    flex-direction: column;
-    justify-content: space-around;
-    align-items: center;
-  }
 </style>

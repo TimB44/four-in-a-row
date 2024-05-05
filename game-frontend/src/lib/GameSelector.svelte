@@ -15,11 +15,16 @@
 
   //Clear the parameters after the page loads
   history.pushState(null, "", location.href.split("?")[0]);
+  console.log("here1");
+  console.log(id);
+
 
 
   // Auto load game ID if in the URL
   onMount(() => {
     if (!isNaN(id)) {
+      console.log("here");
+      
       let isFir = first === "1";
 
       modeSettings = { id, playerIsFirst: isFir };
@@ -173,7 +178,7 @@
 <style>
   #container {
     width: 700px;
-    height: 500px;
+    height: 400px;
     border: 2px solid #d9d9d9;
     border-radius: 30px;
     display: flex;

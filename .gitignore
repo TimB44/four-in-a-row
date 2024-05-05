@@ -5,7 +5,7 @@
 *.vscode/
 /game-frontend/dist
 
-
+**/keys
 
 # Logs
 game-frontend/logs

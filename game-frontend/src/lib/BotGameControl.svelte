@@ -15,6 +15,7 @@
   onMount(() => {
     if (!playerIsFirst) {
       board.disableButtons();
+      playAIMove();
     }
   });
 
