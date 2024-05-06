@@ -1,10 +1,4 @@
-use axum::{
-    extract::State,
-    http::StatusCode,
-    response::IntoResponse,
-    routing::post,
-    Json, Router,
-};
+use axum::{extract::State, http::StatusCode, response::IntoResponse, routing::post, Json, Router};
 
 use crate::GameMap;
 use game_lib::board::{GameBoard, GameMove, GamePlayer};
@@ -19,11 +13,10 @@ const GAME_TIMEOUT_DURATION: u64 = 300;
 
 static GAME_ID_COUNTER: AtomicU32 = AtomicU32::new(0);
 pub(crate) struct GameState {
-    // game_id: u32,
     game_state: GameBoard,
     update_event: Sender<[[i8; 7]; 6]>,
     last_update: Instant,
-    // some controller
+    reset_by_one: bool,
 }
 impl GameState {
     fn new() -> GameState {
@@ -31,17 +24,34 @@ impl GameState {
             game_state: GameBoard::new(),
             update_event: broadcast::channel(CHANNEL_CAPACITY).0,
             last_update: Instant::now(),
+            reset_by_one: false,
         }
     }
+
+    fn reset(&mut self) -> Result<(), &'static str> {
+        self.last_update = Instant::now();
+        if !self.game_state.is_over() {
+            return Err("Can not reset a game that is not over");
+        }
+
+        if !self.reset_by_one {
+            self.reset_by_one = true;
+            return Ok(());
+        }
+
+        self.game_state = GameBoard::new();
+        self.reset_by_one = false;
+        let _ = self.update_event.send([[0; 7]; 6]);
+        Ok(())
+    }
 }
-
-
 
 pub(crate) fn routes() -> Router<GameMap> {
     Router::new()
         .route("/create_game", post(create_game))
         .route("/get_board", post(get_next_update))
         .route("/make_move", post(make_move))
+        .route("/reset_game", post(reset_game))
 }
 
 #[derive(Deserialize)]
@@ -87,7 +97,7 @@ async fn get_next_update(
     let mut rx = game.update_event.subscribe();
 
     if !game.game_state.equals_arr(&prev_board) {
-        return Json(json!({"board" : game.game_state.to_arr()})).into_response();
+        return Json(json!({"board" :  game.game_state.to_arr()})).into_response();
     }
 
     // Do not hold onto the mutex while waiting for an update
@@ -104,7 +114,6 @@ async fn get_next_update(
         }
     };
 
-    println!("Here with board: {:?}", update);
     Json(json!({"board" : update})).into_response()
 }
 
@@ -189,7 +198,7 @@ async fn make_move(
     // If no one is listening that is fine
     let _ = game.update_event.send(game.game_state.to_arr());
     game.last_update = Instant::now();
-    
+
     StatusCode::OK.into_response()
 }
 
@@ -198,12 +207,51 @@ pub(crate) fn start_cleanup(map: GameMap) -> tokio::task::JoinHandle<()> {
         loop {
             tokio::time::sleep(tokio::time::Duration::from_secs(SECS_BETWEEN_CLEANUP)).await;
             let mut guard = map.lock().await;
-            println!("here: {}", guard.len());
             let now = Instant::now();
             guard.retain(|_, game| {
                 now.duration_since(game.last_update).as_secs() < GAME_TIMEOUT_DURATION
             });
-            println!("here: {}", guard.len());
         }
     })
+}
+
+#[derive(Deserialize)]
+struct ResetGameParams {
+    game_id: Option<u32>,
+}
+async fn reset_game(
+    State(games): State<GameMap>,
+    Json(params): Json<ResetGameParams>,
+) -> impl IntoResponse {
+    let id = match params.game_id {
+        Some(id) => id,
+        None => return (StatusCode::BAD_REQUEST, "Must provide game_id parameter").into_response(),
+    };
+
+    let mut map = games.lock().await;
+
+    let game = match map.get_mut(&id) {
+        Some(game) => game,
+        None => {
+            return (
+                StatusCode::NOT_FOUND,
+                "No game with the given game_id found",
+            )
+                .into_response()
+        }
+    };
+
+    let mut rx = game.update_event.subscribe();
+
+    if let Err(err) = game.reset() {
+        (StatusCode::BAD_REQUEST, err).into_response();
+    }
+
+    // Don't Hold onto Mutex while waiting for other player to reset
+    drop(map);
+
+    if let Err(_) = rx.recv().await {
+        return StatusCode::INTERNAL_SERVER_ERROR.into_response();
+    }
+    return StatusCode::OK.into_response();
 }

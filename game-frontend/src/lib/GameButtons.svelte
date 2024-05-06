@@ -41,8 +41,8 @@
 
 <style>
     div {
-      width: 700px;
-        height: 100px;
+      width: max(min(calc(100vh - 300px), min(1200px, 100vw)), 300px);
+        height: min(calc(max(min(calc(100vh - 300px), min(1200px, 100vw)), 300px) / 7), 100px);
       display: flex;
       flex-direction: row;
       align-items: stretch;

@@ -11,7 +11,6 @@
   let gameIsOver = false;
   let gameOverText = "";
   let board;
-
   onMount(() => {
     if (!playerIsFirst) {
       board.disableButtons();
@@ -20,7 +19,7 @@
   });
 
   async function playAIMove() {
-    let resp = await fetch("/ai", {
+    let promise = fetch("/ai", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -30,6 +29,9 @@
         difficulty: botDiff,
       }),
     });
+
+    board.waitOnPromise(promise);
+    let resp = await promise;
     if (!resp.ok) {
       console.log("Could not get AI move from server");
       errorEvent("Could not get AI move from server");
@@ -49,22 +51,17 @@
   }
 </script>
 
-{#if gameIsOver}
-  <GameEndScreen
-    on:replayClicked={() => {
-      gameIsOver = false;
-      board.clear();
-    }}
-    on:menuClicked
-    gameText={gameOverText}
-  />
-{/if}
 <Board
+  {gameOverText}
   bind:this={board}
+  on:menuClicked
+  on:error
+  on:replayClicked={() => {
+    board.clear();
+  }}
   on:playerMove={() => {
     if (!board.gameOver()) playAIMove();
   }}
-  on:error
   on:gameEnd={(e) => {
     gameOverText = e.detail.message;
     gameIsOver = true;

@@ -1,10 +1,11 @@
 use axum::{http::{StatusCode, Uri}, response::IntoResponse, routing::post, Json, Router};
+use axum_server::tls_rustls::RustlsConfig;
 use multiplayer::start_cleanup;
 use serde::Deserialize;
 use serde_json::json;
-use std::collections::HashMap;
+use std::{collections::HashMap, net::SocketAddr};
 use std::sync::Arc;
-use tokio::{net::TcpListener, sync::Mutex, task};
+use tokio::{ sync::Mutex, task};
 use tower_http::services::{ServeDir, ServeFile};
 
 mod ai;
@@ -26,13 +27,19 @@ async fn main() {
         .nest_service("/static", ServeDir::new("static"))
         .fallback(handle_fallback);
 
-    //"127.0.0.1:8080"
-    let listener = TcpListener::bind("0.0.0.0:8080") //192.168.86.21:8080 127.0.0.1:8080
+        let config = RustlsConfig::from_pem_file(
+            "keys/MyCertificate.crt",
+            "keys/MyKey.key",
+        )
         .await
-        .expect("Could not create the tcp listener");
-    println!("->> LISTENING on {:?} \n", listener.local_addr());
-
-    axum::serve(listener, routes).await.unwrap();
+        .unwrap();
+    
+        let addr = SocketAddr::from(([0, 0, 0, 0], 443));
+        println!("listening on {}", addr);
+        axum_server::bind_rustls(addr, config)
+            .serve(routes.into_make_service())
+            .await
+            .unwrap();
 }
 
 async fn handle_fallback(uri: Uri){

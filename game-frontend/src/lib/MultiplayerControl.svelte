@@ -2,18 +2,13 @@
   import { createEventDispatcher } from "svelte";
   import Board from "./Board.svelte";
   import { onMount } from "svelte";
-  import GameEndScreen from "./GameEndScreen.svelte";
 
-  export let playerIsFirst = true;
-  export let gameId = -1;
+  export let playerIsFirst;
+  export let gameId;
   const dispatch = createEventDispatcher();
 
   let board;
-  let gameIsOver = false;
   let gameOverText = "";
-
-  console.log(playerIsFirst);
-  console.log(gameId);
 
   onMount(() => {
     if (playerIsFirst) {
@@ -51,8 +46,9 @@
       getOpponentMove();
     }
   }
+
   async function getOpponentMove() {
-    let resp = await fetch("/multiplayer/get_board", {
+    let promise = fetch("/multiplayer/get_board", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -63,6 +59,8 @@
         current_board: board.getBoard(),
       }),
     });
+    board.waitOnPromise(promise);
+    let resp = await promise;
 
     if (!resp.ok) {
       errorEvent("Could not get opponents move");
@@ -96,26 +94,45 @@
     }
     return moves;
   }
+
+  async function resetGame() {
+    let promise = fetch("/multiplayer/reset_game", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        game_id: gameId,
+      }),
+    });
+    console.log("here 1");
+    board.waitOnPromise(promise);
+    let resp = await promise;
+    console.log("here 2");
+
+    if (!resp.ok) {
+      errorEvent("Could not reset game");
+      return;
+    }
+    board.clear();
+    if (playerIsFirst) {
+      board.enableButtons();
+    } else {
+      board.disableButtons();
+      getOpponentMove();
+    }
+  }
 </script>
 
-{#if gameIsOver}
-  <!-- TODO add some http endpoint to reset a game that is over -->
-  <GameEndScreen
-    on:replayClicked={() => {
-      gameIsOver = false;
-      board.clear();
-    }}
-    on:menuClicked
-    gameText={gameOverText}
-  />
-{/if}
 <Board
+  {gameOverText}
   bind:this={board}
-  on:playerMove={(e) => sendNewMove(e.detail.col)}
   on:error
+  on:menuClicked
+  on:replayClicked={resetGame}
+  on:playerMove={(e) => sendNewMove(e.detail.col)}
   on:gameEnd={(e) => {
     gameOverText = e.detail.message;
-    gameIsOver = true;
   }}
 />
 

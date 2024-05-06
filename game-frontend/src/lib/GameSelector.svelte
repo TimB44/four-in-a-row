@@ -18,13 +18,11 @@
   console.log("here1");
   console.log(id);
 
-
-
   // Auto load game ID if in the URL
   onMount(() => {
     if (!isNaN(id)) {
       console.log("here");
-      
+
       let isFir = first === "1";
 
       modeSettings = { id, playerIsFirst: isFir };
@@ -55,8 +53,8 @@
     navigator.clipboard.writeText(url + urlParams);
   }
 
-  function submitClicked(){
-    $gameSettings = {mode, modeSettings};
+  function submitClicked() {
+    $gameSettings = { mode, modeSettings };
   }
 </script>
 
@@ -170,11 +168,14 @@
         }}>Get ID</button
       >
       <button on:click={copyUrlToClipboard}>Copy URL for opponent</button>
-      <span>{`?id=${modeSettings["id"]}&fir=${modeSettings["playerIsFirst"] === true ? 0 : 1}`}</span>
+      <span
+        >{`?id=${modeSettings["id"]}&fir=${modeSettings["playerIsFirst"] === true ? 0 : 1}`}</span
+      >
     </div>
   {/if}
   <button on:click={submitClicked}>Play</button>
 </div>
+
 <style>
   #container {
     width: 700px;

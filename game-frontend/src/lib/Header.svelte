@@ -1,7 +1,5 @@
 <div class="header">
-  <!-- //"https://www.timblamires.com" -->
-
-  <a href="https://www.apple.com" class="red">
+  <a href="https://www.timblamires.com" class="red">
     <xml version="1.0" encoding="utf-8">
       <svg
         class="red"
@@ -58,11 +56,13 @@
   }
   h1 {
     margin: 0;
-    font-size: 4em;
+    margin-left: 10px;
+    margin-right: 10px;
+    font-size: 3em;
   }
   svg {
-    width: 60px;
-    height: 60px;
+    width: 40px;
+    height: 40px;
     fill: #d9d9d9;
     padding: 10px;
   }

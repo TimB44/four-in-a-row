@@ -1,8 +1,14 @@
 <script>
+  import { fade } from "svelte/transition";
   import GameButtons from "./GameButtons.svelte";
+  import GameEndScreen from "./GameEndScreen.svelte";
   import Piece from "./Piece.svelte";
   import { gameIsOver, top } from "./game-lib";
   import { createEventDispatcher } from "svelte";
+  import Waiting from "./Waiting.svelte";
+
+  export let gameOverText;
+  
 
   let dispatch = createEventDispatcher();
   let disabledButtons = Array(7).fill(false);
@@ -11,7 +17,13 @@
   let pieces = [];
   let buttons;
   let isOver = false;
+  let justStarted = true;
+  let promise = Promise.resolve();
+  setTimeout(() => (justStarted = false), 1000);
 
+  export function waitOnPromise(newPromise){
+    setTimeout(() => promise = newPromise, 150);
+  }
   export function clear() {
     pieces = [];
     disabledButtons = Array(7).fill(false);
@@ -19,6 +31,7 @@
     turns = 0;
     isOver = false;
     buttons.enable();
+    promise = Promise.resolve();
   }
 
   /**
@@ -109,46 +122,78 @@
   }
 </script>
 
-<!-- some svg code adapted from https://rossta.net/blog/connect-four-with-svg-pattern-masking.html -->
-<svg viewBox="0 0 700 700" xmlns="http://www.w3.org/2000/svg">
-  <defs>
-    <pattern
-      id="cell-pattern"
-      patternUnits="userSpaceOnUse"
-      width="100"
-      height="100"
-    >
-      <circle cx="50" cy="50" r="45" fill="black"></circle>
-    </pattern>
-    <mask id="cell-mask">
-      <rect width="700" height="700" fill="white"></rect>
-      <rect width="700" height="700" fill="url(#cell-pattern)"></rect>
-    </mask>
-  </defs>
-  {#each pieces as { row, col, color }, i (i)}
-    <Piece {row} {col} {color}></Piece>
-  {/each}
+<div class="grid">
+  <div
+    class="container gridItem"
+    transition:fade={{ delay: 150, duration: 300 }}
+  >
+    <!-- some svg code adapted from https://rossta.net/blog/connect-four-with-svg-pattern-masking.html -->
+    <svg viewBox="0 0 700 700" xmlns="http://www.w3.org/2000/svg">
+      <defs>
+        <pattern
+          id="cell-pattern"
+          patternUnits="userSpaceOnUse"
+          width="100"
+          height="100"
+        >
+          <circle cx="50" cy="50" r="45" fill="black"></circle>
+        </pattern>
+        <mask id="cell-mask">
+          <rect width="700" height="700" fill="white"></rect>
+          <rect width="700" height="700" fill="url(#cell-pattern)"></rect>
+        </mask>
+      </defs>
+      {#each pieces as { row, col, color }, i (i)}
+        <Piece {row} {col} {color}></Piece>
+      {/each}
 
-  <rect
-    x="0"
-    y="100"
-    height="600"
-    width="700"
-    fill="#303030"
-    mask="url(#cell-mask)"
-  ></rect>
-</svg>
-<GameButtons
-  bind:this={buttons}
-  on:buttonClick={(e) => {
-    playMove(e.detail.col);
-    buttonPressEvent(e.detail.col);
-  }}
-></GameButtons>
+      <rect
+        x="0"
+        y="100"
+        height="600"
+        width="700"
+        fill="#303030"
+        mask="url(#cell-mask)"
+      ></rect>
+    </svg>
+    <GameButtons
+      bind:this={buttons}
+      on:buttonClick={(e) => {
+        playMove(e.detail.col);
+        buttonPressEvent(e.detail.col);
+      }}
+    ></GameButtons>
+  </div>
+  {#await promise}
+    {#if !justStarted}
+      <div class="gridItem" transition:fade={{ delay: 150, duration: 300 }}>
+        <Waiting />
+      </div>
+    {/if}
+  {/await}
+  {#if isOver}
+    <div class="gridItem" transition:fade={{ delay: 150, duration: 300 }}>
+      <GameEndScreen gameText={gameOverText} on:menuClicked on:replayClicked />
+    </div>
+  {/if}
+</div>
 
 <style>
   svg {
-    width: 700px;
-    height: 700px;
+    width: max(min(calc(100vh - 300px), min(1200px, 100vw)), 300px);
+    height: max(min(calc(100vh - 300px), min(1200px, 100vw)), 300px);
+  }
+  div.container {
+    display: flex;
+    flex-direction: column;
+  }
+  .gridItem {
+    grid-row: 1;
+    grid-column: 1;
+  }
+  div.grid {
+    display: grid;
+    justify-items: center;
+    align-items: center;
   }
 </style>
