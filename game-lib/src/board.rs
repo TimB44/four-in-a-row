@@ -231,8 +231,8 @@ impl GameBoard {
             for row in 0..6 {
                 if self.board[row][col].is_some()
                     && (self.board[cmp::min(row + 1, 5)][col].is_none()
-                        || self.board[row][cmp::min(col + 1, 6)].is_none()
-                        || self.board[row][cmp::max((col as isize) - 1, 0) as usize].is_none())
+                        || self.board[min(5, row)][cmp::min(col + 1, 6)].is_none()
+                        || self.board[min(5, row)][cmp::max((col as isize) - 1, 0) as usize].is_none())
                 {
                     let modifier =
                         match self.board[row][col].expect("Error in current score logic") {
