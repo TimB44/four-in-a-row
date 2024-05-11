@@ -19,11 +19,6 @@
   }
 </script>
 
-<!-- 
-<head>
-  <title>Four In a Row</title>
-</head> -->
-
 <Header />
 <div class="boardLocation">
   {#if $gameSettings.mode === 0}
