@@ -6,6 +6,7 @@ build:
 	mv game-frontend/dist game-server/static 
 	gsed -i 's/crossorigin//g' game-server/static/index.html
 	gsed -i 's/\/assets/\/static\/assets/g' game-server/static/index.html
+	gsed -i 's/\/icon.svg/\/static\/icon.svg/g' game-server/static/index.html
 
 run: build
 	(cd game-server && cargo run)

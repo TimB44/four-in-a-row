@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<svg viewBox="0 0 400 400" xmlns="http://www.w3.org/2000/svg">
+  <defs/>
+  <rect style="fill: rgb(49, 49, 49); paint-order: fill; fill-rule: nonzero; stroke: rgb(217, 217, 217); stroke-width: 5px;" x="10" y="10" width="380" height="380" rx="50" ry="50"/>
+  <ellipse style="stroke: rgb(0, 0, 0); fill: rgb(229, 57, 53);" cx="100" cy="100" rx="60" ry="60"/>
+  <ellipse style="stroke: rgb(0, 0, 0); fill: rgb(4, 191, 191);" cx="300" cy="100" rx="60" ry="60"/>
+  <ellipse style="stroke: rgb(0, 0, 0); fill: rgb(229, 57, 53);" cx="300" cy="300" rx="60" ry="60"/>
+  <ellipse style="stroke: rgb(0, 0, 0); fill: rgb(4, 191, 191);" cx="100" cy="300" rx="60" ry="60"/>
+</svg>

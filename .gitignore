@@ -1,5 +1,6 @@
 /game-lib/target/
 /game-server/target/
+/game-server/static/
 
 .vscode/
 *.vscode/
