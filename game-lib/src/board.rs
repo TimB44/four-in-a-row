@@ -6,6 +6,9 @@
 use crate::GameError;
 use std::cmp::{self, max, min};
 
+use rand::thread_rng;
+use rand::seq::SliceRandom;
+
 #[cfg(test)]
 mod game_board_tests;
 
@@ -113,12 +116,15 @@ impl GameBoard {
 
     /// Returns a vector with all of the valid moves
     pub fn moves<'a>(&'a self) -> Vec<GameMove> {
-        self.board[5]
+        let mut moves: Vec<GameMove> = self.board[5]
             .iter()
             .enumerate()
             .filter(|(_, spot)| !self.is_over() && spot.is_none())
             .map(|(col, _)| unsafe { GameMove::build_unchecked(col as i32) })
-            .collect()
+            .collect();
+        moves.shuffle(&mut thread_rng());
+        
+        moves
     }
 
     fn max_streak(&self, col: usize, row: usize) -> u8 {
