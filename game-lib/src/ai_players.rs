@@ -34,14 +34,11 @@ mod tests {
 
     #[test]
     fn test_hard() {
-        
         let mut board = [[None; 7]; 6];
 
         board[0][0] = Some(GamePlayer::SecondPlayer);
         board[1][0] = Some(GamePlayer::SecondPlayer);
         board[2][0] = Some(GamePlayer::FirstPlayer);
-
-
 
         board[0][2] = Some(GamePlayer::FirstPlayer);
         board[1][2] = Some(GamePlayer::FirstPlayer);
@@ -49,154 +46,151 @@ mod tests {
         board[3][2] = Some(GamePlayer::SecondPlayer);
         board[4][2] = Some(GamePlayer::SecondPlayer);
 
-
         board[0][3] = Some(GamePlayer::FirstPlayer);
         board[1][3] = Some(GamePlayer::FirstPlayer);
         board[2][3] = Some(GamePlayer::FirstPlayer);
 
-
         board[0][4] = Some(GamePlayer::SecondPlayer);
         board[1][4] = Some(GamePlayer::SecondPlayer);
 
-        let gb  = GameBoard::build(board).unwrap();
-
+        let gb = GameBoard::build(board).unwrap();
 
         assert_eq!(minimax(gb, 8).unwrap().get_col(), 3);
     }
-    //     #[test]
-    //     fn play_easy_block() {
-    //         let mut board = [[None; 7]; 6];
-    //         board[0][0] = Some(GamePlayer::SecondPlayer);
-    //         board[1][0] = Some(GamePlayer::SecondPlayer);
-    //         board[2][0] = Some(GamePlayer::SecondPlayer);
+    #[test]
+    fn play_easy_block() {
+        let mut board = [[None; 7]; 6];
+        board[0][0] = Some(GamePlayer::SecondPlayer);
+        board[1][0] = Some(GamePlayer::SecondPlayer);
+        board[2][0] = Some(GamePlayer::SecondPlayer);
 
-    //         board[0][4] = Some(GamePlayer::FirstPlayer);
-    //         board[1][4] = Some(GamePlayer::FirstPlayer);
-    //         board[0][5] = Some(GamePlayer::FirstPlayer);
+        board[0][4] = Some(GamePlayer::FirstPlayer);
+        board[1][4] = Some(GamePlayer::FirstPlayer);
+        board[0][5] = Some(GamePlayer::FirstPlayer);
 
-    //         let gb = GameBoard::build(board).unwrap();
+        let gb = GameBoard::build(board).unwrap();
 
-    //         assert_eq!(play_easy(gb), GameMove::build(0));
-    //     }
+        assert_eq!(play_easy(gb), GameMove::build(0));
+    }
 
-    //     #[test]
-    //     fn play_easy_win() {
-    //         let mut board = [[None; 7]; 6];
-    //         board[0][0] = Some(GamePlayer::SecondPlayer);
-    //         board[1][0] = Some(GamePlayer::SecondPlayer);
-    //         board[2][0] = Some(GamePlayer::SecondPlayer);
+    #[test]
+    fn play_easy_win() {
+        let mut board = [[None; 7]; 6];
+        board[0][0] = Some(GamePlayer::SecondPlayer);
+        board[1][0] = Some(GamePlayer::SecondPlayer);
+        board[2][0] = Some(GamePlayer::SecondPlayer);
 
-    //         board[0][4] = Some(GamePlayer::FirstPlayer);
-    //         board[1][4] = Some(GamePlayer::FirstPlayer);
-    //         board[2][4] = Some(GamePlayer::FirstPlayer);
+        board[0][4] = Some(GamePlayer::FirstPlayer);
+        board[1][4] = Some(GamePlayer::FirstPlayer);
+        board[2][4] = Some(GamePlayer::FirstPlayer);
 
-    //         let gb = GameBoard::build(board).unwrap();
+        let gb = GameBoard::build(board).unwrap();
 
-    //         assert_eq!(play_easy(gb), GameMove::build(4));
-    //     }
+        assert_eq!(play_easy(gb), GameMove::build(4));
+    }
 
-    //     #[test]
-    //     fn play_easy_win_second() {
-    //         let mut board = [[None; 7]; 6];
-    //         board[0][0] = Some(GamePlayer::FirstPlayer);
-    //         board[1][0] = Some(GamePlayer::FirstPlayer);
-    //         board[2][0] = Some(GamePlayer::FirstPlayer);
-    //         board[0][1] = Some(GamePlayer::FirstPlayer);
+    #[test]
+    fn play_easy_win_second() {
+        let mut board = [[None; 7]; 6];
+        board[0][0] = Some(GamePlayer::FirstPlayer);
+        board[1][0] = Some(GamePlayer::FirstPlayer);
+        board[2][0] = Some(GamePlayer::FirstPlayer);
+        board[0][1] = Some(GamePlayer::FirstPlayer);
 
-    //         board[0][4] = Some(GamePlayer::SecondPlayer);
-    //         board[1][4] = Some(GamePlayer::SecondPlayer);
-    //         board[2][4] = Some(GamePlayer::SecondPlayer);
+        board[0][4] = Some(GamePlayer::SecondPlayer);
+        board[1][4] = Some(GamePlayer::SecondPlayer);
+        board[2][4] = Some(GamePlayer::SecondPlayer);
 
-    //         let gb = GameBoard::build(board).unwrap();
+        let gb = GameBoard::build(board).unwrap();
 
-    //         assert_eq!(play_easy(gb), GameMove::build(4));
-    //     }
+        assert_eq!(play_easy(gb), GameMove::build(4));
+    }
 
-    //     #[test]
-    //     fn play_med_block() {
-    //         let mut board = [[None; 7]; 6];
-    //         board[0][0] = Some(GamePlayer::SecondPlayer);
-    //         board[1][0] = Some(GamePlayer::SecondPlayer);
-    //         board[2][0] = Some(GamePlayer::SecondPlayer);
+    #[test]
+    fn play_med_block() {
+        let mut board = [[None; 7]; 6];
+        board[0][0] = Some(GamePlayer::SecondPlayer);
+        board[1][0] = Some(GamePlayer::SecondPlayer);
+        board[2][0] = Some(GamePlayer::SecondPlayer);
 
-    //         board[0][4] = Some(GamePlayer::FirstPlayer);
-    //         board[1][4] = Some(GamePlayer::FirstPlayer);
-    //         board[0][5] = Some(GamePlayer::FirstPlayer);
+        board[0][4] = Some(GamePlayer::FirstPlayer);
+        board[1][4] = Some(GamePlayer::FirstPlayer);
+        board[0][5] = Some(GamePlayer::FirstPlayer);
 
-    //         let gb = GameBoard::build(board).unwrap();
+        let gb = GameBoard::build(board).unwrap();
 
-    //         assert_eq!(play_med(gb), GameMove::build(0));
-    //     }
+        assert_eq!(play_med(gb), GameMove::build(0));
+    }
 
-    //     #[test]
-    //     fn play_med_win() {
-    //         let mut board = [[None; 7]; 6];
-    //         board[0][0] = Some(GamePlayer::SecondPlayer);
-    //         board[1][0] = Some(GamePlayer::SecondPlayer);
-    //         board[2][0] = Some(GamePlayer::SecondPlayer);
+    #[test]
+    fn play_med_win() {
+        let mut board = [[None; 7]; 6];
+        board[0][0] = Some(GamePlayer::SecondPlayer);
+        board[1][0] = Some(GamePlayer::SecondPlayer);
+        board[2][0] = Some(GamePlayer::SecondPlayer);
 
-    //         board[0][4] = Some(GamePlayer::FirstPlayer);
-    //         board[1][4] = Some(GamePlayer::FirstPlayer);
-    //         board[2][4] = Some(GamePlayer::FirstPlayer);
+        board[0][4] = Some(GamePlayer::FirstPlayer);
+        board[1][4] = Some(GamePlayer::FirstPlayer);
+        board[2][4] = Some(GamePlayer::FirstPlayer);
 
-    //         let gb = GameBoard::build(board).unwrap();
+        let gb = GameBoard::build(board).unwrap();
 
-    //         assert_eq!(play_med(gb), GameMove::build(4));
-    //     }
+        assert_eq!(play_med(gb), GameMove::build(4));
+    }
 
-    //     #[test]
-    //     fn play_hard_block() {
-    //         let mut board = [[None; 7]; 6];
-    //         board[0][0] = Some(GamePlayer::SecondPlayer);
-    //         board[1][0] = Some(GamePlayer::SecondPlayer);
-    //         board[2][0] = Some(GamePlayer::SecondPlayer);
+    #[test]
+    fn play_hard_block() {
+        let mut board = [[None; 7]; 6];
+        board[0][0] = Some(GamePlayer::SecondPlayer);
+        board[1][0] = Some(GamePlayer::SecondPlayer);
+        board[2][0] = Some(GamePlayer::SecondPlayer);
 
-    //         board[0][4] = Some(GamePlayer::FirstPlayer);
-    //         board[1][4] = Some(GamePlayer::FirstPlayer);
-    //         board[0][5] = Some(GamePlayer::FirstPlayer);
+        board[0][4] = Some(GamePlayer::FirstPlayer);
+        board[1][4] = Some(GamePlayer::FirstPlayer);
+        board[0][5] = Some(GamePlayer::FirstPlayer);
 
-    //         let gb = GameBoard::build(board).unwrap();
+        let gb = GameBoard::build(board).unwrap();
 
-    //         assert_eq!(play_hard(gb), GameMove::build(0));
-    //     }
+        assert_eq!(play_hard(gb), GameMove::build(0));
+    }
 
-    //     #[test]
-    //     fn play_hard_win() {
-    //         let mut board = [[None; 7]; 6];
-    //         board[0][0] = Some(GamePlayer::SecondPlayer);
-    //         board[1][0] = Some(GamePlayer::SecondPlayer);
-    //         board[2][0] = Some(GamePlayer::SecondPlayer);
+    #[test]
+    fn play_hard_win() {
+        let mut board = [[None; 7]; 6];
+        board[0][0] = Some(GamePlayer::SecondPlayer);
+        board[1][0] = Some(GamePlayer::SecondPlayer);
+        board[2][0] = Some(GamePlayer::SecondPlayer);
 
-    //         board[0][4] = Some(GamePlayer::FirstPlayer);
-    //         board[1][4] = Some(GamePlayer::FirstPlayer);
-    //         board[2][4] = Some(GamePlayer::FirstPlayer);
+        board[0][4] = Some(GamePlayer::FirstPlayer);
+        board[1][4] = Some(GamePlayer::FirstPlayer);
+        board[2][4] = Some(GamePlayer::FirstPlayer);
 
-    //         let gb = GameBoard::build(board).unwrap();
+        let gb = GameBoard::build(board).unwrap();
 
-    //         assert_eq!(play_hard(gb), GameMove::build(4));
-    //     }
+        assert_eq!(play_hard(gb), GameMove::build(4));
+    }
 
-    //     #[test]
-    //     fn play_hard_finishes() {
-    //         let mut board = [[None; 7]; 6];
-    //         board[0][3] = Some(GamePlayer::SecondPlayer);
-    //         board[0][4] = Some(GamePlayer::FirstPlayer);
+    #[test]
+    fn play_hard_finishes() {
+        let mut board = [[None; 7]; 6];
+        board[0][3] = Some(GamePlayer::SecondPlayer);
+        board[0][4] = Some(GamePlayer::FirstPlayer);
 
-    //         let gb = GameBoard::build(board).unwrap();
-    //         println!("{:?}", play_hard(gb).unwrap());
-    //     }
+        let gb = GameBoard::build(board).unwrap();
+        println!("{:?}", play_hard(gb).unwrap());
+    }
 
-    //     #[test]
-    //     fn play_hard_mid_game() {
-    //         let mut board = [[None; 7]; 6];
+    #[test]
+    fn play_hard_mid_game() {
+        let mut board = [[None; 7]; 6];
 
-    //         board[0][2] = Some(GamePlayer::FirstPlayer);
-    //         board[0][3] = Some(GamePlayer::FirstPlayer);
+        board[0][2] = Some(GamePlayer::FirstPlayer);
+        board[0][3] = Some(GamePlayer::FirstPlayer);
 
-    //         board[1][3] = Some(GamePlayer::SecondPlayer);
+        board[1][3] = Some(GamePlayer::SecondPlayer);
 
-    //         let gb = GameBoard::build(board).unwrap();
-    //         let gm = play_med(gb).unwrap().get_col();
-    //         assert!(gm == 1 || gm == 4);
-    //     }
+        let gb = GameBoard::build(board).unwrap();
+        let gm = play_med(gb).unwrap().get_col();
+        assert!(gm == 1 || gm == 4);
+    }
 }

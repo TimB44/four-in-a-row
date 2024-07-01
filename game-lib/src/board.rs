@@ -6,8 +6,8 @@
 use crate::GameError;
 use std::cmp::{self, max, min};
 
-use rand::thread_rng;
 use rand::seq::SliceRandom;
+use rand::thread_rng;
 
 #[cfg(test)]
 mod game_board_tests;
@@ -20,6 +20,12 @@ pub struct GameBoard {
     board: [[Option<GamePlayer>; 7]; 6],
     total_moves: u8,
     winning_move: Option<GameMove>,
+}
+
+impl Default for GameBoard {
+    fn default() -> Self {
+        Self::new()
+    }
 }
 
 impl GameBoard {
@@ -45,8 +51,8 @@ impl GameBoard {
 
         let player = self.current_player();
         for i in 0..7 {
-            if self.board[i][col as usize].is_none() {
-                self.board[i][col as usize] = Some(player);
+            if self.board[i][col].is_none() {
+                self.board[i][col] = Some(player);
                 if self.max_streak(col, i) > 3 {
                     self.winning_move = Some(*game_move)
                 }
@@ -115,7 +121,7 @@ impl GameBoard {
     }
 
     /// Returns a vector with all of the valid moves
-    pub fn moves<'a>(&'a self) -> Vec<GameMove> {
+    pub fn moves(&self) -> Vec<GameMove> {
         let mut moves: Vec<GameMove> = self.board[5]
             .iter()
             .enumerate()
@@ -123,7 +129,7 @@ impl GameBoard {
             .map(|(col, _)| unsafe { GameMove::build_unchecked(col as i32) })
             .collect();
         moves.shuffle(&mut thread_rng());
-        
+
         moves
     }
 
@@ -239,36 +245,19 @@ impl GameBoard {
                 if self.board[row][col].is_some()
                     && (self.board[cmp::min(row + 1, 5)][col].is_none()
                         || self.board[min(5, row + 1)][cmp::min(col + 1, 6)].is_none()
-                        || self.board[min(5, row + 1)][cmp::max((col as isize) - 1, 0) as usize].is_none())
+                        || self.board[min(5, row + 1)][cmp::max((col as isize) - 1, 0) as usize]
+                            .is_none())
                 {
-                    let modifier =
-                        match self.board[row][col].expect("Error in current score logic") {
-                            GamePlayer::FirstPlayer => -1,
-                            GamePlayer::SecondPlayer => 1,
-                        };
-                    total += 10_i32.pow((self.max_streak(col, row )).into()) * modifier;
+                    let modifier = match self.board[row][col].expect("Error in current score logic")
+                    {
+                        GamePlayer::FirstPlayer => -1,
+                        GamePlayer::SecondPlayer => 1,
+                    };
+                    total += 10_i32.pow((self.max_streak(col, row)).into()) * modifier;
                 }
             }
         }
         total
-
-        // for col in 0..7 {
-        //     let mut row = 0;
-        //     while row < 6 && self.board[row][col].is_some() {
-        //         row += 1;
-        //     }
-        //     if row == 6 || row == 0 {
-        //         continue;
-        //     }
-
-        //     let modifier = match self.board[row - 1][col].expect("Error in current score logic") {
-        //         GamePlayer::FirstPlayer => -1,
-        //         GamePlayer::SecondPlayer => 1,
-        //     };
-
-        //     total += 10_i32.pow((self.max_streak(col, row - 1)).into()) * modifier;
-        // }
-        // total
     }
 
     /// Builds a GameBoard from the given 2d Array
@@ -307,16 +296,10 @@ impl GameBoard {
         //check for floating pieces in each column
         for col in 0..7 {
             let mut seen_none = false;
-            if board
-                .iter()
-                .map(|row| row[col])
-                .filter(|p| {
-                    seen_none = seen_none | p.is_none();
-                    seen_none && p.is_some()
-                })
-                .next()
-                .is_some()
-            {
+            if board.iter().map(|row| row[col]).any(|p| {
+                seen_none |= p.is_none();
+                seen_none && p.is_some()
+            }) {
                 return Err("Board can not contain floating pieces");
             }
         }

@@ -65,7 +65,7 @@ fn min_player(
     }
 
     let mut min = i32::MAX;
-    for possible_move in board.moves()  {
+    for possible_move in board.moves() {
         board.make_move(&possible_move)?;
 
         min = cmp::min(max_player(board, alpha, beta, depth - 1)?, min);
@@ -100,5 +100,5 @@ fn max_player(
         }
     }
 
-    return Ok(max);
+    Ok(max)
 }
