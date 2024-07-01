@@ -39,7 +39,7 @@
     });
 
     if (!resp.ok) {
-      console.log(await resp.blob());
+      console.error(await resp.blob());
       errorEvent("Could not get opponent move");
     }
     if (!board.gameOver()) {
@@ -55,7 +55,6 @@
       },
       body: JSON.stringify({
         game_id: gameId,
-        // difficulty: botDiff,
         current_board: board.getBoard(),
       }),
     });
@@ -105,16 +104,15 @@
         game_id: gameId,
       }),
     });
-    console.log("here 1");
+    board.clear();
     board.waitOnPromise(promise);
     let resp = await promise;
-    console.log("here 2");
 
     if (!resp.ok) {
       errorEvent("Could not reset game");
       return;
     }
-    board.clear();
+    
     if (playerIsFirst) {
       board.enableButtons();
     } else {
@@ -135,6 +133,3 @@
     gameOverText = e.detail.message;
   }}
 />
-
-<style>
-</style>
