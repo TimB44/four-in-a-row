@@ -188,6 +188,12 @@
             Hard
           </label>
         </div>
+      {:else if mode === 2}
+      <div>
+        <h3>Click Play to Begin</h3>
+        <h4>Red Goes First</h4>
+      </div>
+        
       {:else if mode === 3}
         <div class="settingsContainer">
           <h3>Choose Your Color</h3>
@@ -205,7 +211,7 @@
             />
             Red
           </label>
-          <span>(Red Goes first)</span>
+          
           <label>
             <input
               checked={modeSettings["playerIsFirst"] === false}
@@ -220,6 +226,7 @@
             />
             Blue
           </label>
+          <span>(Red Goes first)</span>
           <h3>Link for Opponent</h3>
           <div class="horizontal">
             <div
