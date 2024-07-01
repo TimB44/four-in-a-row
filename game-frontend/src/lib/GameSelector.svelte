@@ -17,8 +17,6 @@
 
   //Clear the parameters after the page loads
   history.pushState(null, "", location.href.split("?")[0]);
-  console.log("here1");
-  console.log(id);
 
   // Auto load game ID if in the URL
   onMount(() => {
@@ -73,24 +71,25 @@
     <div class="container">
       <div class="modeButtons horizontal" style="justify-content: center;">
         <h3 style="margin: 6px;">Game Invite</h3>
-
       </div>
       <div class="horizontal">
-        <button class="margin"
-        on:click={() => {
-          invited = false;
-          submitClicked();
-        }}>Play</button
-      >
-      <button class="margin"
-        on:click={() => {
-          modeSettings = { playerIsFirst: true, botDiff: "easy" };
-          mode = 1;
-          invited = false;
-        }}>Back</button
-      >
+        <button
+          class="margin"
+          on:click={() => {
+            invited = false;
+            submitClicked();
+          }}>Play</button
+        >
+        <button
+          class="margin"
+          on:click={() => {
+            modeSettings = { playerIsFirst: true, botDiff: "easy" };
+            mode = 1;
+            invited = false;
+          }}>Back</button
+        >
       </div>
-      
+
       <div></div>
     </div>
   {:else}
@@ -154,6 +153,7 @@
             />
             Blue
           </label>
+          <span>(Red Goes first)</span>
 
           <h3>AI Difficulty</h3>
 
@@ -205,6 +205,7 @@
             />
             Red
           </label>
+          <span>(Red Goes first)</span>
           <label>
             <input
               checked={modeSettings["playerIsFirst"] === false}
@@ -307,5 +308,8 @@
     display: grid;
     justify-items: center;
     align-items: center;
+  }
+  span {
+    opacity: .7;
   }
 </style>
