@@ -20,7 +20,8 @@
     <svg viewBox="0, 0, 100, 100"
     ><circle cx="50" cy="50" r="50" fill="#e53935"></circle></svg 
   >
-  <h1>Join 4</h1>
+  <h1><a id="none" href="/">Join 4</a></h1>
+  
   <svg viewBox="0, 0, 100, 100"
     ><circle cx="50" cy="50" r="50" fill="#04bfbf"></circle></svg
   >
@@ -79,4 +80,9 @@
     background-color: #313131;
     border-radius: 10px;
   }
+
+  #none {
+    all: unset;
+    cursor:pointer;
+}
 </style>
