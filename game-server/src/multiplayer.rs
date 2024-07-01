@@ -250,8 +250,8 @@ async fn reset_game(
     // Don't Hold onto Mutex while waiting for other player to reset
     drop(map);
 
-    if let Err(_) = rx.recv().await {
+    if rx.recv().await.is_err() {
         return StatusCode::INTERNAL_SERVER_ERROR.into_response();
     }
-    return StatusCode::OK.into_response();
+    StatusCode::OK.into_response()
 }
