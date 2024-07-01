@@ -11,6 +11,7 @@
   let gameIsOver = false;
   let gameOverText = "";
   let board;
+  const minDelayForMoves = 750
   onMount(() => {
     if (!playerIsFirst) {
       board.disableButtons();
@@ -29,11 +30,14 @@
         difficulty: botDiff,
       }),
     });
+    
 
-    board.waitOnPromise(promise);
-    let resp = await promise;
+
+    let withMin = Promise.all([promise, new Promise((resolve) => setTimeout(resolve, minDelayForMoves))])
+    board.waitOnPromise(withMin);
+    let resp = (await withMin)[0];
     if (!resp.ok) {
-      console.log("Could not get AI move from server");
+      console.error("Could not get AI move from server");
       errorEvent("Could not get AI move from server");
       return;
     }
