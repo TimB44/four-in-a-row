@@ -1,5 +1,3 @@
-use std::time::Instant;
-
 use crate::{
     board::{GameBoard, GameMove},
     minimax::minimax,
@@ -18,10 +16,7 @@ pub fn play_med(board: GameBoard) -> Result<GameMove, GameError> {
 
 /// Finds a move by performing a minimax game tree search with a depth of 8
 pub fn play_hard(board: GameBoard) -> Result<GameMove, GameError> {
-    let i = Instant::now();
-    let r = minimax(board, 9);
-    println!("{:?}", i.elapsed());
-    r
+    minimax(board, 9)
 }
 
 #[cfg(test)]
