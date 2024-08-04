@@ -19,4 +19,4 @@ The game-frontend is Svelte project which has the UI and the logic to interact w
 
 A Makefile is used to build the project, which compiles the frontend code and copies it into the server. The server is then built using cargo.
 
-A Dockerfile is also used to Dockerize the application, which allows it to be easily ran on the cloud.
+A Dockerfile is also used to Dockerize the application, which allows it to be easily ran in the cloud.
