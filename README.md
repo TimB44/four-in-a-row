@@ -1,7 +1,7 @@
 # Join 4
 
 Created By: Tim Blamires
-Website URL: [Join 4](www.join4.app)
+Website URL: [Join 4](https://www.join4.app)
 
 ## Summary
 
