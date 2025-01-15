@@ -11,7 +11,7 @@ This project is build with 3 main parts.
 - game-server
 - game-frontend
 
-The game-lib is a Rust library containing the needed types and function to allow for AI players and multiplayer support.
+The game-lib is a Rust library containing the needed types and functions to allow for AI players and multiplayer support.
 
 The game-server is a Rust Axum server which exposes a REST api allowing for both AI players and multiplayer games.
 
