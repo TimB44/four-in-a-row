@@ -12,12 +12,15 @@ use rand::thread_rng;
 #[cfg(test)]
 mod game_board_tests;
 
+const BOARD_WIDTH: usize = 7;
+const BOARD_HEIGHT: usize = 6;
+
 /// Represents a valid connect 4 game that could be over. This struct
 /// contains many methods which allow for the game to progress though
 /// playing moves.
 #[derive(Debug, Clone, Copy)]
 pub struct GameBoard {
-    board: [[Option<GamePlayer>; 7]; 6],
+    board: [[Option<GamePlayer>; BOARD_WIDTH]; BOARD_HEIGHT],
     total_moves: u8,
     winning_move: Option<GameMove>,
 }
@@ -32,7 +35,7 @@ impl GameBoard {
     /// Returns an empty board with no pieces played
     pub fn new() -> GameBoard {
         GameBoard {
-            board: [[None; 7]; 6],
+            board: [[None; BOARD_WIDTH]; BOARD_HEIGHT],
             total_moves: 0,
             winning_move: None,
         }
@@ -50,7 +53,7 @@ impl GameBoard {
         }
 
         let player = self.current_player();
-        for i in 0..7 {
+        for i in 0..BOARD_WIDTH {
             if self.board[i][col].is_none() {
                 self.board[i][col] = Some(player);
                 if self.max_streak(col, i) > 3 {
@@ -83,7 +86,7 @@ impl GameBoard {
             self.winning_move = None;
         }
 
-        for i in (0..6).rev() {
+        for i in (0..BOARD_HEIGHT).rev() {
             if let Some(player) = self.board[i][col as usize] {
                 if player == self.current_player() {
                     return Err("Attempted to remove incorrect player piece");
@@ -149,7 +152,7 @@ impl GameBoard {
         }
 
         // Upper branch
-        for i in (row + 1)..6 {
+        for i in (row + 1)..BOARD_HEIGHT {
             if self.board[i][col] != Some(player) {
                 break;
             }
@@ -167,7 +170,7 @@ impl GameBoard {
         }
 
         //right branch
-        for i in (col + 1)..7 {
+        for i in (col + 1)..BOARD_WIDTH {
             if self.board[row][i] != Some(player) {
                 break;
             }
@@ -189,7 +192,7 @@ impl GameBoard {
         }
 
         // right branch
-        let max_offset = min(5 - row, 6 - col);
+        let max_offset = min(5 - row, BOARD_HEIGHT - col);
         for i in 1..=max_offset {
             if self.board[row + i][col + i] != Some(player) {
                 break;
@@ -212,7 +215,7 @@ impl GameBoard {
         }
 
         // right branch
-        let max_offset = min(row, 6 - col);
+        let max_offset = min(row, BOARD_HEIGHT - col);
         for i in 1..=max_offset {
             if self.board[row - i][col + i] != Some(player) {
                 break;
@@ -239,12 +242,12 @@ impl GameBoard {
 
         let mut total = 0;
 
-        for col in 0..7 {
-            for row in 0..6 {
+        for col in 0..BOARD_WIDTH {
+            for row in 0..BOARD_HEIGHT {
                 // Consider the streak if the piece is adjacent to an empty spot
                 if self.board[row][col].is_some()
                     && (self.board[cmp::min(row + 1, 5)][col].is_none()
-                        || self.board[min(5, row + 1)][cmp::min(col + 1, 6)].is_none()
+                        || self.board[min(5, row + 1)][cmp::min(col + 1, BOARD_HEIGHT)].is_none()
                         || self.board[min(5, row + 1)][cmp::max((col as isize) - 1, 0) as usize]
                             .is_none())
                 {
@@ -269,7 +272,9 @@ impl GameBoard {
     /// - The Board contains floating pieces
     /// - The Board contains an invalid number of either players piece
     ///
-    pub fn build(board: [[Option<GamePlayer>; 7]; 6]) -> Result<GameBoard, GameError> {
+    pub fn build(
+        board: [[Option<GamePlayer>; BOARD_WIDTH]; BOARD_HEIGHT],
+    ) -> Result<GameBoard, GameError> {
         //check for invalid number of pieces
         let mut first_count: i32 = 0;
         let mut second_count: i32 = 0;
@@ -294,7 +299,7 @@ impl GameBoard {
         }
 
         //check for floating pieces in each column
-        for col in 0..7 {
+        for col in 0..BOARD_WIDTH {
             let mut seen_none = false;
             if board.iter().map(|row| row[col]).any(|p| {
                 seen_none |= p.is_none();
@@ -310,8 +315,8 @@ impl GameBoard {
             winning_move: None,
         };
 
-        for row in 0..6 {
-            for col in 0..7 {
+        for row in 0..BOARD_HEIGHT {
+            for col in 0..BOARD_WIDTH {
                 if board.max_streak(col, row) > 3 {
                     return Err("Game is already over");
                 }
@@ -331,9 +336,9 @@ impl GameBoard {
     /// - O represents an empty spot
     /// - 1 represents a piece from the first player
     /// - -1 represents a piece from the second player
-    pub fn equals_arr(&self, prev_board: &[[i8; 7]; 6]) -> bool {
-        for row in 0..6 {
-            for col in 0..7 {
+    pub fn equals_arr(&self, prev_board: &[[i8; BOARD_WIDTH]; BOARD_HEIGHT]) -> bool {
+        for row in 0..BOARD_HEIGHT {
+            for col in 0..BOARD_WIDTH {
                 let player = match self.board[row][col] {
                     Some(player) => player.to_int(),
                     None => 0,
@@ -358,10 +363,10 @@ impl GameBoard {
     /// - O represents an empty spot
     /// - 1 represents a piece from the first player
     /// - -1 represents a piece from the second player
-    pub fn to_arr(&self) -> [[i8; 7]; 6] {
-        let mut arr = [[0; 7]; 6];
-        for row in 0..6 {
-            for col in 0..7 {
+    pub fn to_arr(&self) -> [[i8; BOARD_WIDTH]; BOARD_HEIGHT] {
+        let mut arr = [[0; BOARD_WIDTH]; BOARD_HEIGHT];
+        for row in 0..BOARD_HEIGHT {
+            for col in 0..BOARD_WIDTH {
                 if let Some(player) = self.board[row][col] {
                     arr[row][col] = player.to_int();
                 }
@@ -398,7 +403,7 @@ impl GamePlayer {
 }
 
 /// Represents a valid game move. This requirement guarantees that
-/// the move will be in the range of [0, 7)
+/// the move will be in the range of [0, BOARD_WIDTH)
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub struct GameMove(u8);
 
@@ -412,7 +417,7 @@ impl GameMove {
     ///
     /// # Unsafe
     /// When using this you must guarantee yourself that the provided column is in the
-    /// range of [0, 7). Failing to do so could cause a panic when using the move
+    /// range of [0, BOARD_WIDTH). Failing to do so could cause a panic when using the move
     ///
     unsafe fn build_unchecked(col: i32) -> Self {
         GameMove(col as u8)
@@ -421,9 +426,9 @@ impl GameMove {
     /// Builds a gameMove from the given column
     ///
     /// # Errors
-    /// If the move is not in the range of [0, 7)
+    /// If the move is not in the range of [0, BOARD_WIDTH)
     pub fn build(col: u8) -> Result<GameMove, &'static str> {
-        if col < 7 {
+        if col < BOARD_WIDTH as u8 {
             Ok(GameMove(col))
         } else {
             Err("Columns must be between 0 and 7")
